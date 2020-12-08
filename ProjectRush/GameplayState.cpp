@@ -58,7 +58,8 @@ void GameplayState::initTexture()
 void GameplayState::initPlayer()
 {
 	//random player spawn postion
-	this->player->setPosition(static_cast<float>(rand() % 2000) + 100.f, static_cast<float>(rand() % 2000) + 100.f);
+	//this->player->setPosition(static_cast<float>(rand() % 2000) + 100.f, static_cast<float>(rand() % 2000) + 100.f);
+	this->player->setPosition(100.f, 100.f);
 }
 
 void GameplayState::initItem()
@@ -68,7 +69,6 @@ void GameplayState::initItem()
 
 void GameplayState::initView()
 {
-	
 	this->view->setSize(this->window->getSize().x, this->window->getSize().y);
 	this->view->setCenter(this->player->getPosition());
 }
@@ -92,6 +92,8 @@ GameplayState::GameplayState(sf::RenderWindow* window, std::map<std::string, int
 	this->initItem();
 	this->initView();
 	this->initGUI();
+
+	this->enemies.push_back(new Enemy(this->textures["SLIME"], "MONSTER", 300.f, 300.f));
 }
 
 GameplayState::~GameplayState()
@@ -106,10 +108,10 @@ GameplayState::~GameplayState()
 		delete bullet;
 	}
 	//delete Enemies
-	//for (auto* enemy : this->enemies)
-	//{
-	//	delete enemy;
-	//}
+	for (auto* enemy : this->enemies)
+	{
+		delete enemy;
+	}
 }
 
 void GameplayState::endState()
@@ -155,9 +157,7 @@ void GameplayState::updateView(const float& dt)
 void GameplayState::updateInput(const float& dt)
 {
 	this->checkForQuit();
-	//sf::Vector2f shootPos;
-	//shootPos.x = this->player->getPosition().x + (this->player->getGlobalBounds().width / 2.f);
-	//shootPos.y = this->player->getPosition().y;
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
 		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getShootCD())
@@ -253,27 +253,45 @@ void GameplayState::updateBullet(const float& dt)
 	//DEBUG
 	//std::cout << this->mousePosView.x << " " << this->mousePosView.y << " "  << this->aimDir.x << " " << this->aimDir.y << " X = " << this->aimDirNorm.x << " Y = " << this->aimDirNorm.y << "\n";
 
-	unsigned counter = 0;
+	int counter = 0;
 	for (auto* bullet : this->bullets)
 	{
 		bullet->update();
 
-		//bullet culling (right screen)
+		//DELETE BULLET AT RIGHT 
 		if (bullet->getBounds().left + bullet->getBounds().width > this->view->getCenter().x + this->window->getSize().x / 2.f + 100.f)
 		{
 			//delete bullet
 			delete this->bullets.at(counter);
 			this->bullets.erase(this->bullets.begin() + counter);
 			--counter;
-			std::cout << this->bullets.size() << std::endl;
+			std::cout << this->bullets.size() << " RIGHT" << "\n";
 		}
-		//bullet culling (left screen)
-		if (bullet->getBounds().left < this->view->getCenter().x - this->window->getSize().x / 2.f - 100.f)
+		//DELETE BULLET AT LEFT 
+		else if (bullet->getBounds().left < this->view->getCenter().x - this->window->getSize().x / 2.f - 100.f)
 		{
 			delete this->bullets.at(counter);
 			this->bullets.erase(this->bullets.begin() + counter);
 			--counter;
-			std::cout << this->bullets.size() << std::endl;
+			std::cout << this->bullets.size() << " LEFT" << "\n";
+		}
+		//DELETE BULLET AT BOTTOM 
+		else if (bullet->getBounds().top + bullet->getBounds().height > this->view->getCenter().y + (this->window->getSize().y / 2.f) + 100.f)
+		{
+			//delete bullet
+			delete this->bullets.at(counter);
+			this->bullets.erase(this->bullets.begin() + counter);
+			--counter;
+			std::cout << this->bullets.size() << " BOTTOM" << "\n";
+		}
+		//DELETE BULLET AT TOP 
+		else if (bullet->getBounds().top < this->view->getCenter().y - (this->window->getSize().y / 2.f) - 100.f)
+		{
+			//delete bullet
+			delete this->bullets.at(counter);
+			this->bullets.erase(this->bullets.begin() + counter);
+			--counter;
+			std::cout << this->bullets.size() << " TOP" << "\n";
 		}
 
 		int temp = 0;
@@ -353,10 +371,10 @@ void GameplayState::render(sf::RenderTarget* target)
 	{
 		bullet->render(this->window);
 	}
-	//for (auto* enemy : this->enemies)
-	//{
-	//	enemy->render(this->window);
-	//}
+	for (auto* enemy : this->enemies)
+	{
+		enemy->render(this->window);
+	}
 
 	this->renderPlayer();					//Render Player
 }

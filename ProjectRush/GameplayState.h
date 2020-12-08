@@ -1,7 +1,7 @@
 #pragma once
 #include "Player.h"
 #include "Bullet.h"
-//#include "Enemy.h"
+#include "Enemy.h"
 #include "Platform.h"
 #include "MainMenuState.h"
 //#include "GameOverState.h"
@@ -36,8 +36,8 @@ private:
     float nextViewPos;
 
     //Enemy
-    //std::vector<Enemy*> enemies;
-   // sf::Vector2f enemyDirection;
+    std::vector<Enemy*> enemies;
+    sf::Vector2f enemyDirection;
 
     //Pos at mouse for bullet
     sf::Vector2f aimDir;

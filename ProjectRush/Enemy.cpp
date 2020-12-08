@@ -41,8 +41,8 @@ Enemy::Enemy(sf::Texture* texture, std::string type, float pos_x, float pos_y)
 {
 	this->sprite.setTexture(*texture);
 	this->sprite.setPosition(pos_x, pos_y);
-	this->body.setSize(sf::Vector2f(texture->getSize()));
-	this->body.setPosition(pos_x, pos_y);
+	//this->body.setSize(sf::Vector2f(texture->getSize()));
+	//this->body.setPosition(pos_x, pos_y);
 	this->texture = *texture;
 
 	this->initPos.x = pos_x;
@@ -58,7 +58,7 @@ Enemy::Enemy(sf::Texture* texture, std::string type, float pos_x, float pos_y)
 	//Add animations
 	if (this->type == "SLIME")
 	{
-		this->hitbox = new Hitbox(this->sprite, 50, 0, 50, 100);
+		this->hitbox = new Hitbox(this->sprite, 0, 0, 36, 27);
 		this->hpMax = 2;
 		this->maxVelocityX = 150.f;
 		this->hp = hpMax;
@@ -167,7 +167,7 @@ void Enemy::randomItem()
 
 Collider Enemy::getCollider()
 {
-	return Collider(this->body);
+	return Collider(this->hitbox->getHitbox());
 }
 
 void Enemy::updatePhysics(const float& dt)
