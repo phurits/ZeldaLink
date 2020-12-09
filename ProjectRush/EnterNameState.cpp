@@ -4,7 +4,12 @@
 //Initializer
 void EnterNameState::initVariables()
 {
+	this->background.setOrigin(this->window->getSize().x / 2, this->window->getSize().y / 2);
+	this->background.setPosition(this->view->getCenter());
+	//this->background.setPosition(this->view->getCenter().x - this->window->getSize().x / 2.f, this->view->getCenter().y - this->window->getSize().y / 2.f);
 	this->player = new Player();
+
+
 	this->player->setPosition(20.f, 20.f);
 
 	this->nameEnter.setFont(this->font);
@@ -19,7 +24,7 @@ void EnterNameState::initVariables()
 	this->textHolder.setSize(sf::Vector2f(200.f, 50.f));
 	this->textHolder.setOutlineThickness(1.f);
 	this->textHolder.setOutlineColor(sf::Color::Black);
-	this->textHolder.setPosition(sf::Vector2f(700, 300.f));
+	this->textHolder.setPosition(sf::Vector2f(700,300));
 
 	this->text.setFillColor(sf::Color::Black);
 }
@@ -58,7 +63,7 @@ void EnterNameState::initText()
 	this->input = "";
 	this->text.setFont(this->font);
 	this->text.setCharacterSize(25.f);
-	this->text.setPosition(sf::Vector2f(this->view->getCenter().x - 100, 310.f));
+	this->text.setPosition(700,310);
 }
 
 void EnterNameState::initKeybinds()
@@ -80,7 +85,7 @@ void EnterNameState::initKeybinds()
 
 void EnterNameState::initButtons()
 {
-	this->buttons["GAME_STATE"] = new Button(700 ,400, 200, 50, &this->font, "START", 40,
+	this->buttons["GAME_STATE"] = new Button(this->view->getCenter().x - this->window->getSize().x / 2.f + 700 , this->view->getCenter().y - this->window->getSize().y / 2.f + 400, 200, 50, &this->font, "START", 40,
 		sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0));
 }
 

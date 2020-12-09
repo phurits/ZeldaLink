@@ -11,6 +11,12 @@ private:
 	sf::Font* font;
 	sf::Text text;
 
+	//Sound
+	sf::SoundBuffer mHover;
+	sf::Sound mHoverSound;
+	sf::SoundBuffer mClick;
+	sf::Sound mClickSound;
+
 	sf::Color idleColor;
 	sf::Color hoverColor;
 	sf::Color activeColor;

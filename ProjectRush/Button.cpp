@@ -26,6 +26,17 @@ Button::Button(float x, float y, float width, float height, sf::Font* font, std:
 	this->activeColor = activeColor;
 
 	this->shape.setFillColor(this->idleColor);
+
+	//initSound
+	if (!this->mHover.loadFromFile("Resources/Sounds/LTTP_Menu_Cursor.wav"))
+		std::cout << "ERROR::PLAYER::COULD NOT LOAD mHOVER" << std::endl;
+	this->mHoverSound.setBuffer(mHover);
+	this->mHoverSound.setVolume(30.f);
+
+	if (!this->mClick.loadFromFile("Resources/Sounds/LTTP_Menu_Select.wav"))
+		std::cout << "ERROR::PLAYER::COULD NOT LOAD mCLICK" << std::endl;
+	this->mClickSound.setBuffer(mClick);
+	this->mClickSound.setVolume(30.f);
 }
 
 Button::~Button()
@@ -67,11 +78,13 @@ void Button::update(const sf::Vector2f mousePos)
 		this->text.setFillColor(sf::Color(255, 255, 255, 255));
 		break;
 	case BTN_HOVER:
+		this->mHoverSound.play();
 		this->shape.setFillColor(this->hoverColor);
 		this->text.setScale(1.1f, 1.1f);
 		this->text.setFillColor(sf::Color(180, 0, 0, 255));
 		break;
 	case BTN_ACTIVE:
+		this->mClickSound.play();
 		this->shape.setFillColor(this->activeColor);
 		this->text.setFillColor(sf::Color(255, 255, 255, 255));
 		break;

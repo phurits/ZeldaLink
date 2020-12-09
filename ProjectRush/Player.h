@@ -36,6 +36,11 @@ private:
 	sf::Clock shootCooldown;
 	bool isShooting;
 
+	//sound effects
+	
+	sf::SoundBuffer takeDmgsfx;
+	sf::Sound takeDmgSound;
+
 	//Initializations
 	void initVariables();
 	void initTexture();
@@ -75,7 +80,6 @@ public:
 	void createHitbox(float offset_x, float offset_y, float width, float height);
 
 	//Functions
-	void onCollision(sf::Vector2f direction);
 	void move(const float& dt, const float dir_x, const float dir_y);
 	void resetToNormal(const float& dt);
 	void updateMovement(const float& dt);

@@ -11,10 +11,11 @@ void Game::initWindow()
 	this->VideoModes = sf::VideoMode::getFullscreenModes();
 
 	std::string title = "none";
-	this->windowBounds.width = 800;
-	this->windowBounds.height = 600;
+	this->windowBounds.width = 1600;
+	this->windowBounds.height = 900;
 	unsigned framelate_limit = 60;
 	bool vertical_sync_enabled = false;
+	this->view.setCenter(this->windowBounds.width / 2, this->windowBounds.height / 2);
 
 	if (config.is_open())
 	{
@@ -135,6 +136,7 @@ void Game::run()
 		this->updateDt();
 		this->update(this->dt);
 		this->render();
+		//std::cout << this->view.getCenter().x << " " << this->view.getCenter().y << "\n";
 	}
 }
 

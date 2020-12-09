@@ -10,6 +10,7 @@ State::State(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys
 
 	this->view = view;
 	this->player = player;
+
 }
 
 State::~State()

@@ -1,6 +1,5 @@
 #pragma once
 #include "Player.h"
-#include "GameState.h"
 #include "Bullet.h"
 #include "Platform.h"
 #include "MainMenuState.h"

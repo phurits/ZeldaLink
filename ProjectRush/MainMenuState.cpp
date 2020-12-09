@@ -6,7 +6,7 @@
 //Initializer Functions
 void MainMenuState::initVariables()
 {
-	this->view->setCenter(this->window->getSize().x / 2.f, this->window->getSize().y / 2.f);
+	this->view->setCenter(this->window->getSize().x / 2, this->window->getSize().y / 2);
 }
 
 void MainMenuState::initMusic()
@@ -28,6 +28,9 @@ void MainMenuState::initBackground()
 	}
 
 	this->background.setTexture(&this->backgroundTexture);
+	this->background.setOrigin(this->window->getSize().x / 2, this->window->getSize().y / 2);
+	this->background.setPosition(this->view->getCenter());
+	//this->background.setPosition(this->view->getCenter().x - this->window->getSize().x / 2.f, this->view->getCenter().y - this->window->getSize().y / 2.f);
 }
 
 void MainMenuState::initFonts()
@@ -70,11 +73,11 @@ void MainMenuState::initKeybinds()
 
 void MainMenuState::initButtons()
 {
-	this->buttons["NAME_ENTER"] = new Button(700, 300, 250, 50, &this->font, "NEW GAME", 40,
+	this->buttons["NAME_ENTER"] = new Button(this->view->getCenter().x - this->window->getSize().x / 2.f + 700, this->view->getCenter().y - this->window->getSize().y / 2.f + 300, 250, 50, &this->font, "NEW GAME", 40,
 		sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0));
-	this->buttons["SCORE_BOARD"] = new Button(700 , 400, 250, 50, &this->font, "HIGHSCORE", 40,
+	this->buttons["HIGHSCORE_STATE"] = new Button(this->view->getCenter().x - this->window->getSize().x / 2.f + 700, this->view->getCenter().y - this->window->getSize().y / 2.f + 400, 250, 50, &this->font, "HIGHSCORE", 40,
 		sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0));
-	this->buttons["EXIT_STATE"] = new Button(700, 500, 250, 50, &this->font, "QUIT", 40,
+	this->buttons["EXIT_STATE"] = new Button(this->view->getCenter().x - this->window->getSize().x / 2.f + 700, this->view->getCenter().y - this->window->getSize().y / 2.f + 500, 250, 50, &this->font, "QUIT", 40,
 		sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0));
 }
 
@@ -120,9 +123,9 @@ void MainMenuState::updateButtons()
 	}
 
 	//SCOREBOARD
-	if (this->buttons["SCORE_BOARD"]->isPressed())
+	if (this->buttons["HIGHSCORE_STATE"]->isPressed())
 	{
-		//this->states->push(new ScoreBoardState(this->window, this->supportedKeys, this->states, this->view, this->player));
+		this->states->push(new HighScoreState(this->window, this->supportedKeys, this->states, this->view, this->player));
 	}
 
 	//Quit
@@ -147,7 +150,7 @@ void MainMenuState::update(const float& dt)
 	this->updateInput(dt);
 	this->updateButtons();
 
-
+	std::cout << this->view->getCenter().x << " " << this->view->getCenter().y << "\n";
 	//std::cout << this->mousePosView.x << " " << this->mousePosView.y << std::endl;
 }
 

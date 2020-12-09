@@ -18,10 +18,12 @@ void GameplayState::initKeybinds()
 	ifs.close();
 }
 
-void GameplayState::initPlatform()
+void GameplayState::initFont()
 {
-	this->direction.x = 0.f;
-	this->direction.y = 0.f;
+	if (!this->font.loadFromFile("Fonts/triforce.ttf"))
+	{
+		std::cout << "ERROR::MAINMENUSTATE::COULD NOT LOAD FONT!" << std::endl;
+	}
 }
 
 void GameplayState::initVariables()
@@ -48,6 +50,27 @@ void GameplayState::initMusic()
 
 void GameplayState::initSoundEffects()
 {
+	if (!this->pShoot.loadFromFile("Resources/Sounds/LTTP_Cane_Magic.wav"))
+		std::cout << "ERROR::PLAYER::COULD NOT LOAD pSHOOT" << std::endl;
+	this->pShootSound.setBuffer(pShoot);
+	this->pShootSound.setVolume(30.f);
+
+	if (!this->eDeath.loadFromFile("Resources/Sounds/LTTP_Enemy_Kill.wav"))
+		std::cout << "ERROR::PLAYER::COULD NOT LOAD eDEATH" << std::endl;
+	this->eDeathSound.setBuffer(eDeath);
+	this->eDeathSound.setVolume(20.f);
+
+	if (!this->eHit.loadFromFile("Resources/Sounds/LTTP_Enemy_Hit.wav"))
+		std::cout << "ERROR::PLAYER::COULD NOT LOAD eHIT" << std::endl;
+	this->eHitSound.setBuffer(eHit);
+	this->eHitSound.setVolume(10.f);
+
+	if(!this->pDeath.loadFromFile("Resources/Sounds/LTTP_Link_Fall.wav"))
+		std::cout << "ERROR::PLAYER::COULD NOT LOAD pDEATH" << std::endl;
+	this->pDeathSound.setBuffer(pDeath);
+	this->pDeathSound.setVolume(30.f);
+
+
 }
 
 void GameplayState::initTexture()
@@ -77,22 +100,49 @@ void GameplayState::initView()
 
 void GameplayState::initGUI()
 {
+	//HEALTHBAR
+	this->hpBar.setPosition(10.f, 35.f);
+	this->hpBar.setSize(sf::Vector2f(10.f * this->player->getHp(), 30.f));
+	this->hpBar.setFillColor(sf::Color::Red);
+		//health holder box
+	this->hpBarOutline.setPosition(10.f, 35.f);
+	this->hpBarOutline.setSize(sf::Vector2f(10.f * this->player->getMaxHp(), 30.f));
+	this->hpBarOutline.setOutlineThickness(1.f);
+	this->hpBarOutline.setOutlineColor(sf::Color::Transparent);
+	this->hpBarOutline.setFillColor(sf::Color(0,0,0,128));
+
+	this->health.setFont(this->font);
+	this->health.setPosition((10.f * this->player->getMaxHp()) / 2, 40.f);
+	this->health.setString(std::to_string(this->player->getHp()) + " / " + std::to_string(this->player->getMaxHp()));
+	this->health.setCharacterSize(20.f);
+	this->health.setFillColor(sf::Color::White);
+	this->health.setOutlineThickness(1.f);
+
+
+	this->scoreText.setFont(this->font);
+	this->scoreText.setLetterSpacing(2.f);
+	this->scoreText.setString(std::to_string(this->player->getScore()));
+	this->scoreText.setCharacterSize(30.f);
+	this->scoreText.setFillColor(sf::Color::Yellow);
+	this->scoreText.setOutlineThickness(2.f);
+	this->scoreText.setOutlineColor(sf::Color::Black);
+	this->scoreText.setPosition(this->view->getCenter().x + this->window->getSize().x / 2.f - this->scoreText.getGlobalBounds().width - 20.f, this->view->getCenter().y - (this->window->getSize().y) / 2.f + 10.f);
 }
 
 GameplayState::GameplayState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states, sf::View* view, Player* player)
 	: State(window, supportedKeys, states, view, player)
 {
 	
+	this->initView();
 	this->initTexture();
+	this->initFont();
 	this->initVariables();
 	this->initPlayer();
 	this->initMusic();
 	this->initSoundEffects();
-	this->initPlatform();
 	this->initKeybinds();
 	this->initBackground();
 	this->initItem();
-	this->initView();
 	this->initGUI();
 }
 
@@ -114,6 +164,11 @@ GameplayState::~GameplayState()
 	}
 }
 
+sf::Text GameplayState::getScoreText()
+{
+	return this->scoreText;
+}
+
 void GameplayState::endState()
 {
 	std::cout << "Ending Game State!" << "\n";
@@ -131,9 +186,7 @@ void GameplayState::spawnEnemies()
 	{
 		if (this->enemyCount < this->enemyMax)
 		{
-			this->enemies.push_back(new Enemy(this->textures["SLIME"], "T_SLIME",
-				enemyPos.x,
-				enemyPos.y));
+			this->enemies.push_back(new Enemy(this->textures["SLIME"], "T_SLIME", enemyPos.x, enemyPos.y));
 			this->enemyCount++;
 		}
 	}
@@ -178,6 +231,7 @@ void GameplayState::updateInput(const float& dt)
 	{
 		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getShootCD())
 		{
+			this->pShootSound.play();
 			this->bullets.push_back(new Bullet(this->textures["FIREBALL"], 
 				this->player->getPosition().x + (this->player->getGlobalBounds().width / 2.f),
 				this->player->getPosition().y + (this->player->getGlobalBounds().height / 2.f), 
@@ -189,6 +243,7 @@ void GameplayState::updateInput(const float& dt)
 	{
 		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getShootCD())
 		{
+			this->pShootSound.play();
 			this->bullets.push_back(new Bullet(this->textures["FIREBALL"],
 				this->player->getPosition().x + (this->player->getGlobalBounds().width / 2.f),
 				this->player->getPosition().y + (this->player->getGlobalBounds().height / 2.f),
@@ -200,6 +255,7 @@ void GameplayState::updateInput(const float& dt)
 	{
 		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getShootCD())
 		{
+			this->pShootSound.play();
 			this->bullets.push_back(new Bullet(this->textures["FIREBALL"],
 				this->player->getPosition().x + (this->player->getGlobalBounds().width / 2.f),
 				this->player->getPosition().y + (this->player->getGlobalBounds().height / 2.f),
@@ -211,6 +267,7 @@ void GameplayState::updateInput(const float& dt)
 	{
 		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getShootCD())
 		{
+			this->pShootSound.play();
 			this->bullets.push_back(new Bullet(this->textures["FIREBALL"],
 				this->player->getPosition().x + (this->player->getGlobalBounds().width / 2.f),
 				this->player->getPosition().y + (this->player->getGlobalBounds().height / 2.f),
@@ -274,7 +331,7 @@ void GameplayState::updateCollision(const float& dt)
 			{
 				this->player->addScore(enemy->getPoint());
 			}
-			
+			enemy->takeDmg(999);
 		}
 	}
 	//DEBUG PLAYER POSITION
@@ -289,13 +346,6 @@ void GameplayState::updateItemsCollision(const float& dt)
 
 void GameplayState::updateBullet(const float& dt)
 {
-
-	this->aimDir = sf::Vector2f(this->mousePosView.x - (this->player->getPosition().x + (this->player->getGlobalBounds().width / 2.f)), this->mousePosView.y - (this->player->getPosition().y + (this->player->getGlobalBounds().height / 2.f)));
-	this->aimDirNorm = this->aimDir / sqrt(pow(this->aimDir.x, 2) + pow(this->aimDir.y, 2));
-
-	//DEBUG
-	//std::cout << this->mousePosView.x << " " << this->mousePosView.y << " "  << this->aimDir.x << " " << this->aimDir.y << " X = " << this->aimDirNorm.x << " Y = " << this->aimDirNorm.y << "\n";
-
 	int counter = 0;
 	for (auto* bullet : this->bullets)
 	{
@@ -343,11 +393,13 @@ void GameplayState::updateBullet(const float& dt)
 		{
 			if (bullet->getBounds().intersects(enemy->getGlobalBounds()) && enemy->getHp() > 0)
 			{
+				this->eHitSound.play();
 				//std::cout << enemy->getHp() << std::endl;
 				enemy->takeDmg(1);
 				////if enemy's hp is 0
 				if (enemy->getHp() == 0)
 				{
+					this->eDeathSound.play();
 					this->player->addScore(enemy->getPoint());
 					//if (enemy->getIsDrop())
 					//	this->items.push_back(new Item(this->textures["HEALTH"], "HEAL", enemy->getPosition().x, enemy->getPosition().y + enemy->getGlobalBounds().height - 40.f));
@@ -370,6 +422,27 @@ void GameplayState::updateBullet(const float& dt)
 
 void GameplayState::updateGUI(const float& dt)
 {
+	this->hpBarOutline.setPosition(this->view->getCenter().x - (this->window->getSize().x / 2.f) + 10.f, this->view->getCenter().y - (this->window->getSize().y) / 2.f + 35.f);
+	this->hpBar.setPosition(this->view->getCenter().x - (this->window->getSize().x / 2.f) + 10.f, this->view->getCenter().y - (this->window->getSize().y / 2.f) + 35.f);
+	this->hpBar.setSize(sf::Vector2f(this->player->getHp() * 10.f, 30.f));
+
+	this->health.setString(std::to_string(this->player->getHp()) + " / " + std::to_string(this->player->getMaxHp()));
+	this->health.setPosition((this->view->getCenter().x - (this->window->getSize().x / 2.f)) + 20.f, this->view->getCenter().y - (this->window->getSize().y / 2.f) + 35.f);
+
+	this->scoreText.setString(std::to_string(this->player->getScore()));
+	this->scoreText.setPosition(this->view->getCenter().x + this->window->getSize().x / 2.f - this->scoreText.getGlobalBounds().width - 20.f, this->view->getCenter().y - (this->window->getSize().y) / 2.f + 10.f);
+
+}
+
+void GameplayState::updateToNextState(const float& dt)
+{
+	if (this->player->getHp() <= 0)
+	{
+		this->pDeathSound.play();
+		if (!this->states->empty())
+			this->states->pop();
+		this->states->push(new GameOverState(this->window, this->supportedKeys, this->states, this->view, this->player));
+	}
 }
 
 void GameplayState::update(const float& dt)
@@ -388,8 +461,9 @@ void GameplayState::update(const float& dt)
 
 	this->updateView(dt);
 	this->updateGUI(dt);
+	this->updateToNextState(dt);
 
-	
+	//std::cout << this->view->getCenter().x << " " << this->view->getCenter().y << "\n";
 }
 
 void GameplayState::renderPlayer()
@@ -399,6 +473,11 @@ void GameplayState::renderPlayer()
 
 void GameplayState::renderGUI()
 {
+	this->window->draw(this->hpBar);
+	this->window->draw(this->hpBarOutline);
+	this->window->draw(this->health);
+
+	this->window->draw(this->scoreText);
 }
 
 void GameplayState::render(sf::RenderTarget* target)
@@ -420,4 +499,6 @@ void GameplayState::render(sf::RenderTarget* target)
 	}
 
 	this->renderPlayer();					//Render Player
+
+	this->renderGUI();
 }

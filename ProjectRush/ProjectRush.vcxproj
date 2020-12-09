@@ -156,7 +156,9 @@
     <ClCompile Include="EnterNameState.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameOverState.cpp" />
     <ClCompile Include="GameplayState.cpp" />
+    <ClCompile Include="HighScoreState.cpp" />
     <ClCompile Include="Hitbox.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="main.cpp" />
@@ -179,7 +181,9 @@
     <ClInclude Include="EnterNameState.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameOverState.h" />
     <ClInclude Include="GameplayState.h" />
+    <ClInclude Include="HighScoreState.h" />
     <ClInclude Include="Hitbox.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="MainMenuState.h" />

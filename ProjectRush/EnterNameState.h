@@ -1,6 +1,5 @@
 #pragma once
 #include "State.h"
-#include "GameState.h"
 #include "GameplayState.h"
 
 class EnterNameState :

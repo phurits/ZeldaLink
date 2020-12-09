@@ -6,7 +6,7 @@ void Player::initVariables()
 {
 	this->sprite = new sf::Sprite;
 	this->animationState = P_IDLE;
-	this->maxHp = 20.f;
+	this->maxHp = 10.f;
 	this->hp = maxHp;
 	this->shootCD = 0.4f;
 	this->name = "";
@@ -22,7 +22,6 @@ void Player::initTexture()
 void Player::initSprite()
 {
 	this->sprite->setTexture(this->textureSheet);
-	//this->sprite->setScale(2.5f, 2.5f);
 }
 
 void Player::initAnimationComponent()
@@ -32,15 +31,10 @@ void Player::initAnimationComponent()
 
 void Player::initSoundEffects()
 {
-	//if (!this->gunshot.loadFromFile("Resources/Sound Effects/gun4.wav"))
-	//	std::cout << "ERROR::PLAYER::COULD NOT LOAD FROM FILE GUN1" << std::endl;
-	//this->gunshotSound.setBuffer(gunshot);
-	//this->gunshotSound.setVolume(30.f);
-
-	//if (!this->takeDmgsfx.loadFromFile("Resources/Sound Effects/player_take_dmg.wav"))
-	//	std::cout << "ERROR::PLAYER::COULD NOT LOAD FROM FILE PLAYER_TAKE_DMG" << std::endl;
-	//this->takeDmgSound.setBuffer(this->takeDmgsfx);
-	//this->takeDmgSound.setVolume(30.f);
+	if (!this->takeDmgsfx.loadFromFile("Resources/Sounds/LTTP_Link_Hurt.wav"))
+		std::cout << "ERROR::PLAYER::COULD NOT LOAD FROM FILE PLAYER_TAKE_DMG" << std::endl;
+	this->takeDmgSound.setBuffer(this->takeDmgsfx);
+	this->takeDmgSound.setVolume(50.f);
 }
 
 //Constructors / Destructors
@@ -123,7 +117,6 @@ std::string Player::getName()
 }
 
 
-
 //Modifiers
 void Player::setPosition(const float x, const float y)
 {
@@ -133,6 +126,7 @@ void Player::setPosition(const float x, const float y)
 void Player::takeDmg(int dmg)
 {
 	this->sprite->setColor(sf::Color(255, 0, 0, 127));
+	this->takeDmgSound.play();
 	this->hp -= dmg;
 	this->takeDmgTimer.restart();
 }
@@ -176,7 +170,7 @@ void Player::move(const float& dt, const float dir_x, const float dir_y)
 
 void Player::resetToNormal(const float& dt)
 {
-	if (this->takeDmgTimer.getElapsedTime().asSeconds() >= 0.15f)
+	if (this->takeDmgTimer.getElapsedTime().asSeconds() >= 0.3f)
 	{
 		this->sprite->setColor(sf::Color(255, 255, 255, 255));
 	}
@@ -188,37 +182,27 @@ void Player::updateMovement(const float& dt)
 	
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) //LEFT
 	{
-		//this->move(dt, -1.f, 0.f);
+		
 		this->sprite->move(-2.f, 0.f);
 		this->animationState = P_MOVING_LEFT;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) //RIGHT
 	{
-		//this->move(dt, 1.f, 0.f);
+		
 		this->sprite->move(2.f, 0.f);
 		this->animationState = P_MOVING_RIGHT;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) //UP
 	{
-		//this->move(dt, 0.f, -1.f); 
+		
 		this->sprite->move( 0.f, -2.f); // NOT USING ACC
 		this->animationState = P_MOVING_UP;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) //DOWN
 	{
-		//this->move(dt, 0.f, 1.f);
+		
 		this->sprite->move(0.f, 2.f);
 		this->animationState = P_MOVING_DOWN;
-	}
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		if (this->shootCooldown.getElapsedTime().asSeconds() >= this->shootCD)
-		{
-			this->isShooting = true;
-			//this->gunshotSound.play();
-			this->shootCooldown.restart();
-		}
-
 	}
 }
 

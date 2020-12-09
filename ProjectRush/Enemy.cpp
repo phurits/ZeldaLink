@@ -15,7 +15,12 @@ void Enemy::initVariables()
 
 void Enemy::initSoundEffects()
 {
-	
+	if (!this->takeDmgsfx.loadFromFile("Resources/Sounds/LTTP_Enemy_Hit.wav"))
+	{
+		std::cout << "ERROR::ENEMY::COULD NOT LOAD SOUND EFFECTS ENEMY TAKE DMG" << std::endl;
+	}
+	this->takeDmgSound.setBuffer(this->takeDmgsfx);
+	this->takeDmgSound.setVolume(30.f);
 }
 
 void Enemy::initSprite()
@@ -53,7 +58,7 @@ Enemy::Enemy(sf::Texture* texture, std::string type, float pos_x, float pos_y)
 		this->hitbox = new Hitbox(this->sprite, 0, 0, 36, 27);
 		this->hpMax = 2;
 		this->hp = hpMax;
-		this->points = 5;
+		this->points = 100;
 		this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 2, 0, 36, 27);
 		this->animationComponent->addAnimation("WALK_LEFT", 10.f, 0, 1, 2, 1, 36, 27);
 		this->animationComponent->addAnimation("WALK_RIGHT", 10.f, 0, 2, 2, 2, 36, 27);
@@ -121,6 +126,7 @@ int Enemy::getMaxHp()
 //Modifiers
 void Enemy::takeDmg(int dmg)
 {
+	//this->takeDmgSound.play();
 	this->sprite.setColor(sf::Color(255, 0, 0, 127));
 	this->hp -= dmg;
 	this->takeDmgTimer.restart();

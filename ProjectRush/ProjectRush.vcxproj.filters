@@ -72,6 +72,12 @@
     <ClCompile Include="State.cpp">
       <Filter>State</Filter>
     </ClCompile>
+    <ClCompile Include="GameOverState.cpp">
+      <Filter>State</Filter>
+    </ClCompile>
+    <ClCompile Include="HighScoreState.cpp">
+      <Filter>State</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -123,6 +129,12 @@
       <Filter>State</Filter>
     </ClInclude>
     <ClInclude Include="GameplayState.h">
+      <Filter>State</Filter>
+    </ClInclude>
+    <ClInclude Include="GameOverState.h">
+      <Filter>State</Filter>
+    </ClInclude>
+    <ClInclude Include="HighScoreState.h">
       <Filter>State</Filter>
     </ClInclude>
   </ItemGroup>

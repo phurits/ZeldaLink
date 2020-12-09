@@ -37,6 +37,10 @@ private:
 
 	sf::Vector2f initPos;
 
+	//Sounds
+	sf::SoundBuffer takeDmgsfx;
+	sf::Sound takeDmgSound;
+
 	void initVariables();
 	void initSoundEffects();
 	void initSprite();
