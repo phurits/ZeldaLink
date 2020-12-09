@@ -14,7 +14,7 @@ class Enemy
 private:
 	sf::Texture texture;
 	sf::Sprite sprite;
-	//sf::RectangleShape body;
+	sf::RectangleShape body;
 	std::string type;
 	int hp;
 	int hpMax;
@@ -24,12 +24,7 @@ private:
 	bool isDrop;
 	bool isDeath;
 
-	//Physics
-	sf::Vector2f velocity;
-	float maxVelocityX;
-	float maxVelocityY;
-	float speedValue;
-	float drag;
+	sf::Vector2f enemyVision;
 
 	//Animations
 	AnimationComponent* animationComponent;
@@ -43,7 +38,6 @@ private:
 	sf::Vector2f initPos;
 
 	void initVariables();
-	void initPhysics();
 	void initSoundEffects();
 	void initSprite();
 	void initAnimationComponent();
@@ -55,6 +49,7 @@ public:
 
 	//Accessors
 	short getAnimationState();
+	const sf::FloatRect getHitbox() const;
 	int getHp();
 	int& getPoint();
 	sf::Vector2f getPosition();
@@ -67,7 +62,6 @@ public:
 	//Modifiers
 	void takeDmg(int dmg);
 	void setPosition(float pos_x, float pos_y);
-	void resetVelocityY();
 
 	//Components
 	void createAnimationComponent();
@@ -76,7 +70,6 @@ public:
 	void deathAnimation(const float& dt);
 	void randomItem();
 	Collider getCollider();
-	void updatePhysics(const float& dt);
 	void updateMovement(Player* player, const float& dt);
 	void updateHitbox();
 	void updateAnimation(const float& dt);

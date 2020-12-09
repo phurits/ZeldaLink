@@ -38,6 +38,9 @@ private:
     //Enemy
     std::vector<Enemy*> enemies;
     sf::Vector2f enemyDirection;
+    int enemyMax;
+    int enemyCount;
+    sf::Vector2f spawnRange;
 
     //Pos at mouse for bullet
     sf::Vector2f aimDir;

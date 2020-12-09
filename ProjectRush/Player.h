@@ -36,16 +36,12 @@ private:
 	sf::Clock shootCooldown;
 	bool isShooting;
 
-	//Physics
-	sf::Vector2f velocity;
-
 	//Initializations
 	void initVariables();
 	void initTexture();
 	void initSprite();
 	void initAnimationComponent();
 	void initSoundEffects();
-	void initPhysics();
 
 public:
 	//Constructors / Destructors
@@ -56,6 +52,7 @@ public:
 	const sf::Vector2f getPosition() const;
 	const sf::FloatRect getGlobalBounds() const;
 	sf::Sprite& getSprite();
+	const sf::FloatRect getHitbox() const;
 	short getAnimationState();
 	const float& getShootCD() const;
 	int getHp();
@@ -81,7 +78,6 @@ public:
 	void onCollision(sf::Vector2f direction);
 	void move(const float& dt, const float dir_x, const float dir_y);
 	void resetToNormal(const float& dt);
-	void updatePhysics(const float& dt);
 	void updateMovement(const float& dt);
 	void updateAnimation(const float& dt);
 	void update(const float& dt);

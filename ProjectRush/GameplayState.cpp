@@ -28,6 +28,10 @@ void GameplayState::initVariables()
 {
 	this->score = 0;
 	this->changeColor = 255;
+
+	this->enemyCount = 0;
+	this->enemyMax = 20;
+	this->spawnRange = sf::Vector2f(1000.f, 1000.f);
 	
 }
 
@@ -50,7 +54,6 @@ void GameplayState::initTexture()
 {
 	this->textures["FIREBALL"] = new sf::Texture;
 	this->textures["FIREBALL"]->loadFromFile("Resources/Images/Sprites/Bullet/smallFireball.png");
-
 	this->textures["SLIME"] = new sf::Texture;
 	this->textures["SLIME"]->loadFromFile("Resources/Images/Sprites/Enemy/slime.png");
 }
@@ -58,8 +61,7 @@ void GameplayState::initTexture()
 void GameplayState::initPlayer()
 {
 	//random player spawn postion
-	//this->player->setPosition(static_cast<float>(rand() % 2000) + 100.f, static_cast<float>(rand() % 2000) + 100.f);
-	this->player->setPosition(100.f, 100.f);
+	this->player->setPosition(static_cast<float>(rand() % 2360) + 100.f, static_cast<float>(rand() % 2360) + 100.f);
 }
 
 void GameplayState::initItem()
@@ -92,8 +94,6 @@ GameplayState::GameplayState(sf::RenderWindow* window, std::map<std::string, int
 	this->initItem();
 	this->initView();
 	this->initGUI();
-
-	this->enemies.push_back(new Enemy(this->textures["SLIME"], "MONSTER", 300.f, 300.f));
 }
 
 GameplayState::~GameplayState()
@@ -121,7 +121,23 @@ void GameplayState::endState()
 
 void GameplayState::spawnEnemies()
 {
-	//this->enemies.push_back(new Enemy(this->textures["SLIME"], "MONSTER", 300.f, 300.f));
+	//ENEMY SPAWN RANDOM!
+	sf::Vector2f enemyPos;
+	enemyPos.x = rand() % static_cast<int>(this->background.getGlobalBounds().width - 200) + 100;
+	enemyPos.y = rand() % static_cast<int>(this->background.getGlobalBounds().height - 200) + 100;
+
+		//CHECK DISTANCE BETWEEN PLAYER AND ENEMY
+	if (abs(this->player->getPosition().x - enemyPos.x) > this->spawnRange.x || abs(this->player->getPosition().y - enemyPos.y) > this->spawnRange.y)
+	{
+		if (this->enemyCount < this->enemyMax)
+		{
+			this->enemies.push_back(new Enemy(this->textures["SLIME"], "T_SLIME",
+				enemyPos.x,
+				enemyPos.y));
+			this->enemyCount++;
+		}
+	}
+	
 }
 
 void GameplayState::updateView(const float& dt)
@@ -211,7 +227,22 @@ void GameplayState::updatePlayer(const float& dt)
 
 void GameplayState::updateEnemy(const float& dt)
 {
-	
+	int temp = 0;
+	for (auto* enemy : this->enemies)
+	{
+		enemy->update(this->player, dt);
+		if (enemy->getHp() <= 0)
+		{
+			if (enemy->getIsDeath())
+			{
+				delete this->enemies.at(temp);
+				this->enemies.erase(this->enemies.begin() + temp);
+				temp--;
+				this->enemyCount--;
+			}
+		}
+		temp++;
+	}
 }
 
 void GameplayState::updateCollision(const float& dt)
@@ -234,6 +265,18 @@ void GameplayState::updateCollision(const float& dt)
 		this->player->setPosition(this->player->getPosition().x, this->background.getGlobalBounds().height - this->player->getGlobalBounds().height);
 	}
 
+	for (auto* enemy : this->enemies)
+	{
+		if (this->player->getHitbox().intersects(enemy->getHitbox()) && enemy->getHp() > 0)
+		{
+			this->player->takeDmg(1);
+			if (enemy->getHp() <= 0)
+			{
+				this->player->addScore(enemy->getPoint());
+			}
+			
+		}
+	}
 	//DEBUG PLAYER POSITION
 	//std::cout << this->player->getPosition().x << " " << this->player->getPosition().y << "\n";
 	
@@ -296,32 +339,32 @@ void GameplayState::updateBullet(const float& dt)
 
 		int temp = 0;
 		//check if bullet hit the enemy(ies)
-	//	for (auto* enemy : this->enemies)
-	//	{
-	//		if (bullet->getBounds().intersects(enemy->getGlobalBounds()) && enemy->getHp() > 0)
-	//		{
-	//			//std::cout << enemy->getHp() << std::endl;
-	//			enemy->takeDmg(1);
-	//			////if enemy's hp is 0
-	//			if (enemy->getHp() == 0)
-	//			{
-	//				this->player->addScore(enemy->getPoint());
-	//				//if (enemy->getIsDrop())
-	//				//	this->items.push_back(new Item(this->textures["HEALTH"], "HEAL", enemy->getPosition().x, enemy->getPosition().y + enemy->getGlobalBounds().height - 40.f));
-	//				//	if (enemy->getIsDeath())
-	//				//	{
-	//				//		delete this->enemies.at(temp);
-	//				//		this->enemies.erase(this->enemies.begin() + temp);
-	//				//		temp--;
-	//				//	}
-	//			}
-	//			delete this->bullets.at(counter);
-	//			this->bullets.erase(this->bullets.begin() + counter);
-	//			--counter;
-	//		}
-	//		//temp++;
-	//	}
-	//	++counter;
+		for (auto* enemy : this->enemies)
+		{
+			if (bullet->getBounds().intersects(enemy->getGlobalBounds()) && enemy->getHp() > 0)
+			{
+				//std::cout << enemy->getHp() << std::endl;
+				enemy->takeDmg(1);
+				////if enemy's hp is 0
+				if (enemy->getHp() == 0)
+				{
+					this->player->addScore(enemy->getPoint());
+					//if (enemy->getIsDrop())
+					//	this->items.push_back(new Item(this->textures["HEALTH"], "HEAL", enemy->getPosition().x, enemy->getPosition().y + enemy->getGlobalBounds().height - 40.f));
+						if (enemy->getIsDeath())
+						{
+							delete this->enemies.at(temp);
+							this->enemies.erase(this->enemies.begin() + temp);
+							temp--;
+						}
+				}
+				delete this->bullets.at(counter);
+				this->bullets.erase(this->bullets.begin() + counter);
+				--counter;
+			}
+			//temp++;
+		}
+		++counter;
 	}
 }
 

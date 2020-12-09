@@ -43,29 +43,21 @@ void Player::initSoundEffects()
 	//this->takeDmgSound.setVolume(30.f);
 }
 
-void Player::initPhysics()
-{
-	this->velocity = sf::Vector2f(2.f, 2.f);
-}
-
 //Constructors / Destructors
 Player::Player()
 {
 	this->initVariables();
-	//this->sprite->setPosition(12000, 0);
 	this->initTexture();
 	this->initSprite();
 	this->initSoundEffects();
-	this->initPhysics();
 	this->initAnimationComponent();
+
 	this->createHitbox(30.f,15.f,66.f,90.f);
-
-
 	this->animationComponent->addAnimation("IDLE", 11.f, 0, 4 , 5, 4, 126, 126);
-	this->animationComponent->addAnimation("WALK_LEFT", 7.f, 0, 1 , 5, 1, 126, 126);
-	this->animationComponent->addAnimation("WALK_RIGHT", 7.f, 0, 3 , 5, 3, 126, 126);
-	this->animationComponent->addAnimation("WALK_UP", 7.f, 0, 0 , 5, 0, 126, 126);
-	this->animationComponent->addAnimation("WALK_DOWN", 7.f, 0, 2 , 5, 2, 126, 126);
+	this->animationComponent->addAnimation("WALK_LEFT", 11.f, 0, 1 , 5, 1, 126, 126);
+	this->animationComponent->addAnimation("WALK_RIGHT", 11.f, 0, 3 , 5, 3, 126, 126);
+	this->animationComponent->addAnimation("WALK_UP", 11.f, 0, 0 , 5, 0, 126, 126);
+	this->animationComponent->addAnimation("WALK_DOWN", 11.f, 0, 2 , 5, 2, 126, 126);
 }
 
 Player::~Player()
@@ -89,6 +81,11 @@ const sf::FloatRect Player::getGlobalBounds() const
 sf::Sprite& Player::getSprite()
 {
 	return *this->sprite;
+}
+
+const sf::FloatRect Player::getHitbox() const
+{
+	return sf::FloatRect(this->hitbox->getGlobalBounds());
 }
 
 short Player::getAnimationState()
@@ -136,7 +133,6 @@ void Player::setPosition(const float x, const float y)
 void Player::takeDmg(int dmg)
 {
 	this->sprite->setColor(sf::Color(255, 0, 0, 127));
-	//this->takeDmgSound.play();
 	this->hp -= dmg;
 	this->takeDmgTimer.restart();
 }
@@ -148,9 +144,8 @@ void Player::heal(int x)
 
 void Player::reduceShootCD()
 {
-	this->animationComponent->addAnimation("SHOOT", 1.f, 0, 2, 9, 2, 54, 40);
 	this->shootCD = 0.2f;
-	this->BonusState = true;
+	//this->BonusState = true;
 	this->shootCDTimer.restart();
 }
 
@@ -177,19 +172,6 @@ void Player::createHitbox(float offset_x, float offset_y, float width, float hei
 
 void Player::move(const float& dt, const float dir_x, const float dir_y)
 {
-	////Accelearation
-	//this->velocity.x += dir_x;
-	//this->velocity.y += dir_y;
-	////Limit Max Velocity
-	//if (std::abs(this->velocity.x) > this->velocityMax)
-	//{
-	//	this->velocity.x = this->velocityMax * ((this->velocity.x < 0) ? -1.f : 1.f);
-	//}
-	//if (std::abs(this->velocity.y) > this->velocityMax)
-	//{
-	//	this->velocity.y = this->velocityMax * ((this->velocity.y < 0) ? 1.f : -1.f);
-	//}
-
 }
 
 void Player::resetToNormal(const float& dt)
@@ -198,48 +180,6 @@ void Player::resetToNormal(const float& dt)
 	{
 		this->sprite->setColor(sf::Color(255, 255, 255, 255));
 	}
-
-	if (this->shootCDTimer.getElapsedTime().asSeconds() >= 5.f && this->BonusState)
-	{
-		if (!isShooting)
-		{
-			this->animationComponent->addAnimation("SHOOT", 3.f, 0, 2, 9, 2, 54, 40);
-			this->shootCD = 0.4f;
-			this->BonusState = false;
-		}
-	}
-}
-
-void Player::onCollision(sf::Vector2f direction)
-{
-	if (direction.x < 0.f)
-	{
-		//Collision on the left
-		this->velocity.x = 0.f;
-	}
-	else if (direction.x > 0.f)
-	{
-		//Collision on the right
-		this->velocity.x = 0.f;
-	}
-	if (direction.y < 0.f)
-	{
-		//Collision on the left
-		this->velocity.y = 0.f;
-	}
-	else if (direction.y > 0.f)
-	{
-		//Collision on the right
-		this->velocity.y = 0.f;
-	}
-}
-
-
-
-
-void Player::updatePhysics(const float& dt)
-{
-	//this->sprite->move(this->velocity * dt);
 }
 
 void Player::updateMovement(const float& dt)
@@ -313,10 +253,10 @@ Collider Player::getCollider()
 
 void Player::update(const float& dt)
 {
-	this->updateMovement(dt);	//Update Position of player
-	this->updatePhysics(dt);	//-
+	this->updateMovement(dt);	//Update Position of player	//-
 	this->updateAnimation(dt);	//Movement Animation
 	this->hitbox->update();		//Update hitbox
+	this->resetToNormal(dt);
 
 	//std::cout << this->sprite.getPosition().x << " " << this->sprite.getPosition().y << std::endl;
 }

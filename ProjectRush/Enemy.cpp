@@ -9,15 +9,8 @@ void Enemy::initVariables()
 	this->points = 5;
 	this->dropChance = 30;
 	this->isDeath = false;
+	this->enemyVision = sf::Vector2f(800, 800);
 
-}
-
-void Enemy::initPhysics()
-{
-	this->maxVelocityX = 150.f;
-	this->maxVelocityY = 1000.f;
-	this->speedValue = 50.f;
-	this->drag = 0.95f;
 }
 
 void Enemy::initSoundEffects()
@@ -49,18 +42,16 @@ Enemy::Enemy(sf::Texture* texture, std::string type, float pos_x, float pos_y)
 	this->initPos.y = pos_y;
 
 	this->initVariables();
-	this->initPhysics();
 	this->initSprite();
 	this->initSoundEffects();
 	this->initAnimationComponent();
 	this->randomItem();
 
 	//Add animations
-	if (this->type == "SLIME")
+	if (this->type == "T_SLIME")
 	{
 		this->hitbox = new Hitbox(this->sprite, 0, 0, 36, 27);
 		this->hpMax = 2;
-		this->maxVelocityX = 150.f;
 		this->hp = hpMax;
 		this->points = 5;
 		this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 2, 0, 36, 27);
@@ -79,6 +70,11 @@ Enemy::~Enemy()
 short Enemy::getAnimationState()
 {
 	return this->animationState;
+}
+
+const sf::FloatRect Enemy::getHitbox() const
+{
+	return sf::FloatRect(this->hitbox->getGlobalBounds());
 }
 
 //Accessors
@@ -135,11 +131,6 @@ void Enemy::setPosition(float pos_x, float pos_y)
 	this->sprite.setPosition(pos_x, pos_y);
 }
 
-void Enemy::resetVelocityY()
-{
-	this->velocity.y = 0.f;
-}
-
 
 void Enemy::createAnimationComponent()
 {
@@ -163,67 +154,43 @@ void Enemy::randomItem()
 	else this->isDrop = false;
 }
 
-//Functions
+//Functions =================================================================================================================================================
 
 Collider Enemy::getCollider()
 {
-	return Collider(this->hitbox->getHitbox());
-}
-
-void Enemy::updatePhysics(const float& dt)
-{
-	//this->velocity.y += this->gravity * dt;
-
-	this->velocity *= this->drag;
-
-	if (abs(this->velocity.y) > this->maxVelocityY)
-	{
-		if (this->velocity.y > 0) this->velocity.y = this->maxVelocityY;
-		else this->velocity.y = -this->maxVelocityY;
-	}
-	if (abs(this->velocity.x) > this->maxVelocityX)
-	{
-		if (this->velocity.x > 0) this->velocity.x = this->maxVelocityX;
-		else this->velocity.x = -this->maxVelocityX;
-	}
-
-	//Limit min Velocity
-	if (std::abs(this->velocity.x) < 3.f)
-	{
-		this->velocity.x = 0.f;
-	}
-	if (std::abs(this->velocity.y) < 3.f)
-	{
-		this->velocity.y = 0.f;
-	}
-
-	this->sprite.move(this->velocity * dt);
+	return Collider(this->body);
 }
 
 void Enemy::updateMovement(Player* player, const float& dt)
 {
-	if (this->type == "SLIME" && !this->isDeath)
+	if (this->type == "T_SLIME" && !this->isDeath)
 	{
-		this->animationState = SLIME_IDLE;
-		if (this->sprite.getPosition().x - player->getPosition().x >= 0.f)
+		if (abs(player->getPosition().x - this->sprite.getPosition().x) < this->enemyVision.x && abs(player->getPosition().y - this->sprite.getPosition().y) < this->enemyVision.y)
 		{
-			this->velocity.x -= this->speedValue;
-			this->animationState = SLIME_MOVING_LEFT;
+			if (this->sprite.getPosition().y - (player->getPosition().y + (player->getGlobalBounds().height / 2.f)) > 0.f)
+			{
+				this->sprite.move(0.f, -0.5f);
+				this->animationState = SLIME_MOVING_UP;
+			}
+			else if ((player->getPosition().y + (player->getGlobalBounds().height / 2.f)) - this->sprite.getPosition().y > 0.f)
+			{
+				this->sprite.move(0.f, 0.5f);
+				this->animationState = SLIME_MOVING_DOWN;
+			}
+			if (this->sprite.getPosition().x - (player->getPosition().x + (player->getGlobalBounds().width / 2.f)) > 0.f)
+			{
+				this->sprite.move(-0.5f, 0.f);
+				this->animationState = SLIME_MOVING_LEFT;
+			}
+			else if ((player->getPosition().x + (player->getGlobalBounds().width / 2.f)) - this->sprite.getPosition().x > 0.f)
+			{
+				this->sprite.move(0.5f, 0.f);
+				this->animationState = SLIME_MOVING_RIGHT;
+			}
 		}
-		if (player->getPosition().x - this->sprite.getPosition().x >= 0.f)
+		else
 		{
-			this->velocity.x += this->speedValue;
-			this->animationState = SLIME_MOVING_RIGHT;
-		}
-		if (this->sprite.getPosition().y - player->getPosition().y >= 0.f)
-		{
-			this->velocity.y -= this->speedValue;
-			this->animationState = SLIME_MOVING_UP;
-		}
-		if (player->getPosition().y - this->sprite.getPosition().y >= 0.f)
-		{
-			this->velocity.y += this->speedValue;
-			this->animationState = SLIME_MOVING_DOWN;
+			this->animationState = SLIME_IDLE;
 		}
 	}
 }
@@ -236,7 +203,7 @@ void Enemy::updateHitbox()
 
 void Enemy::updateAnimation(const float& dt)
 {
-	if (this->type == "SLIME")
+	if (this->type == "T_SLIME")
 	{
 		if (this->animationState == SLIME_IDLE)
 		{
@@ -273,7 +240,6 @@ void Enemy::updateColor()
 void Enemy::update(Player* player, const float& dt)
 {
 	this->updateMovement(player, dt);
-	this->updatePhysics(dt);
 	this->updateColor();
 	this->updateAnimation(dt);
 	this->deathAnimation(dt);

@@ -33,6 +33,7 @@ void Game::initWindow()
 
 void Game::initVariables()
 {
+	srand(time(NULL));
 }
 
 void Game::initKeys()
@@ -92,21 +93,10 @@ void Game::updateDt()
 	this->dt = this->dtClock.restart().asSeconds();
 	if (this->dt > 1.0f / 40)
 		this->dt = 1.f / 40.f;
-	//system("cls");
-	//std::cout << this->dt << "\n";
 }
 
 void Game::update(const float& dt)
 {
-	//std::cout << this->currentCamera << " " << this->viewPos.x << std::endl;
-	//polling window events
-	//while (this->window->pollEvent(this->ev)) 
-	//{
-	//	if (this->ev.type == sf::Event::Closed)
-	//		window->close();
-	//	/*if (this->ev.type == sf::Event::KeyPressed && this->ev.key.code == sf::Keyboard::Escape)
-	//		window->close();*/
-	//}
 	if (!this->states.empty())
 	{
 		this->states.top()->update(this->dt);
