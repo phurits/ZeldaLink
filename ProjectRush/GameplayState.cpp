@@ -46,6 +46,10 @@ void GameplayState::initBackground()
 
 void GameplayState::initMusic()
 {
+	this->bg_music.openFromFile("Resources/Sounds/GameState_Music.ogg");
+	this->bg_music.setLoop(true);
+	this->bg_music.setVolume(20.f);
+	this->bg_music.play();
 }
 
 void GameplayState::initSoundEffects()
@@ -171,6 +175,7 @@ sf::Text GameplayState::getScoreText()
 
 void GameplayState::endState()
 {
+	
 	std::cout << "Ending Game State!" << "\n";
 }
 
@@ -439,6 +444,7 @@ void GameplayState::updateToNextState(const float& dt)
 	if (this->player->getHp() <= 0)
 	{
 		this->pDeathSound.play();
+		this->bg_music.pause();
 		if (!this->states->empty())
 			this->states->pop();
 		this->states->push(new GameOverState(this->window, this->supportedKeys, this->states, this->view, this->player));

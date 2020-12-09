@@ -8,6 +8,10 @@ void HighScoreState::initVariables()
 
 void HighScoreState::initMusic()
 {
+	this->bg_music.openFromFile("Resources/Sounds/Highscore_Music.ogg");
+	this->bg_music.setLoop(true);
+	this->bg_music.setVolume(20.f);
+	this->bg_music.play();
 }
 
 void HighScoreState::initBackground()
@@ -94,6 +98,7 @@ void HighScoreState::initButtons()
 HighScoreState::HighScoreState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states, sf::View* view, Player* player)
 	:State(window, supportedKeys, states, view, player)
 {
+	this->initMusic();
 	this->initBackground();
 	this->initFonts();
 	this->initKeybinds();
@@ -127,6 +132,7 @@ void HighScoreState::updateButtons()
 	//BACK TO MAIN MENU
 	if (this->buttons["MAIN_MENU"]->isPressed())
 	{
+		this->bg_music.pause();
 		this->quit = true;
 	}
 }

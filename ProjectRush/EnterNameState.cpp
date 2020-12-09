@@ -31,10 +31,10 @@ void EnterNameState::initVariables()
 
 void EnterNameState::initMusic()
 {
-	//this->bg_music.openFromFile("Resources/Sound Effects/intro.ogg");
-	//this->bg_music.setLoop(true);
-	//this->bg_music.setVolume(10.f);
-	//this->bg_music.play();
+	this->bg_music.openFromFile("Resources/Sounds/EnterNameState_Music.ogg");
+	this->bg_music.setLoop(true);
+	this->bg_music.setVolume(20.f);
+	this->bg_music.play();
 }
 
 void EnterNameState::initBackground()

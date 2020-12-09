@@ -11,10 +11,10 @@ void MainMenuState::initVariables()
 
 void MainMenuState::initMusic()
 {
-	//this->bg_music.openFromFile("Resources/Sound Effects/intro.ogg");
-	//this->bg_music.setLoop(true);
-	//this->bg_music.setVolume(10.f);
-	//this->bg_music.play();
+	this->bg_music.openFromFile("Resources/Sounds/EnterGame_Music.ogg");
+	this->bg_music.setLoop(true);
+	this->bg_music.setVolume(20.f);
+	this->bg_music.play();
 }
 
 void MainMenuState::initBackground()
@@ -118,13 +118,14 @@ void MainMenuState::updateButtons()
 	//Start
 	if (this->buttons["NAME_ENTER"]->isPressed())
 	{
-		this->states->push(new EnterNameState(this->window, this->supportedKeys, this->states, this->view, this->player));
 		this->bg_music.stop();
+		this->states->push(new EnterNameState(this->window, this->supportedKeys, this->states, this->view, this->player));
 	}
 
 	//SCOREBOARD
 	if (this->buttons["HIGHSCORE_STATE"]->isPressed())
 	{
+		this->bg_music.stop();
 		this->states->push(new HighScoreState(this->window, this->supportedKeys, this->states, this->view, this->player));
 	}
 

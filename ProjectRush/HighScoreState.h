@@ -14,6 +14,8 @@ private:
 	sf::Font font;
 	sf::Text scoreBoardText;
 
+	sf::Music bg_music;
+
 	//Highscore
 	FILE* fp;
 	char temp[255];
