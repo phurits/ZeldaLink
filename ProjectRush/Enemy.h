@@ -65,6 +65,7 @@ public:
 	bool getIsDeath();
 	std::string getType();
 	int getMaxHp();
+	sf::Vector2f getCenter();
 
 	//Modifiers
 	void takeDmg(int dmg);

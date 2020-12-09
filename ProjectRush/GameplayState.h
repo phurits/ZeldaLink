@@ -47,11 +47,14 @@ private:
     std::vector<Enemy*> enemies;
     sf::Vector2f enemyDirection;
     sf::Vector2f spawnRange;
-    int ttEnemy;
-    int ttEnemyCount;
-    int blueCount = 0;
-    int pinkCount = 0;
-    sf::Clock pinkSpawnTime;
+
+    int enemyKillCount;
+    int blueAmount;
+    int blueMax;
+    int pinkAmount;
+    int pinkMax;
+    int yellowAmount;
+    int yellowMax;
    
     //Bullets
     std::map<std::string, sf::Texture*> textures;

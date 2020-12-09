@@ -32,7 +32,6 @@ void Enemy::initSprite()
 void Enemy::initAnimationComponent()
 {
 	this->createAnimationComponent();
-	//this->animationState = SLIME_IDLE;
 }
 
 Enemy::Enemy(sf::Texture* texture, std::string type, float pos_x, float pos_y)
@@ -40,8 +39,6 @@ Enemy::Enemy(sf::Texture* texture, std::string type, float pos_x, float pos_y)
 {
 	this->sprite.setTexture(*texture);
 	this->sprite.setPosition(pos_x, pos_y);
-	//this->body.setSize(sf::Vector2f(texture->getSize()));
-	//this->body.setPosition(pos_x, pos_y);
 	this->texture = *texture;
 
 	this->initPos.x = pos_x;
@@ -56,9 +53,10 @@ Enemy::Enemy(sf::Texture* texture, std::string type, float pos_x, float pos_y)
 	//Add animations
 	if (this->type == "BLUE_SLIME")
 	{
+		this->enemyVision = sf::Vector2f(1000, 1000);
 		this->sprite.setScale(1.5f, 1.5f);
 		this->hitbox = new Hitbox(this->sprite, 5, 5, 44, 30);
-		this->hpMax = 2;
+		this->hpMax = 3;
 		this->hp = hpMax;
 		this->points = 100;
 		this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 2, 0, 36, 27);
@@ -69,11 +67,26 @@ Enemy::Enemy(sf::Texture* texture, std::string type, float pos_x, float pos_y)
 	}
 	if (this->type == "PINK_SLIME")
 	{
+		this->enemyVision = sf::Vector2f(1000, 1000);
 		this->sprite.setScale(2.5f, 2.5f);
 		this->hitbox = new Hitbox(this->sprite, 5, 5, 80, 57);
 		this->hpMax = 5;
 		this->hp = hpMax;
 		this->points = 500;
+		this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 2, 0, 36, 27);
+		this->animationComponent->addAnimation("MOVE_LEFT", 10.f, 0, 1, 2, 1, 36, 27);
+		this->animationComponent->addAnimation("MOVE_RIGHT", 10.f, 0, 2, 2, 2, 36, 27);
+		this->animationComponent->addAnimation("MOVE_UP", 10.f, 0, 3, 2, 3, 36, 27);
+		this->animationComponent->addAnimation("MOVE_DOWN", 10.f, 0, 0, 2, 0, 36, 27);
+	}
+	if (this->type == "YELLOW_SLIME")
+	{
+		this->enemyVision = sf::Vector2f(1380, 1380);
+		this->sprite.setScale(1.f,1.f);
+		this->hitbox = new Hitbox(this->sprite, 0, 0, 36, 27);
+		this->hpMax = 1;
+		this->hp = hpMax;
+		this->points = 1000;
 		this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 2, 0, 36, 27);
 		this->animationComponent->addAnimation("MOVE_LEFT", 10.f, 0, 1, 2, 1, 36, 27);
 		this->animationComponent->addAnimation("MOVE_RIGHT", 10.f, 0, 2, 2, 2, 36, 27);
@@ -138,6 +151,11 @@ int Enemy::getMaxHp()
 	return this->hpMax;
 }
 
+sf::Vector2f Enemy::getCenter()
+{
+	return sf::Vector2f(this->sprite.getGlobalBounds().left + (this->sprite.getGlobalBounds().width / 2), this->sprite.getGlobalBounds().top + (this->sprite.getGlobalBounds().height / 2));
+}
+
 //Modifiers
 void Enemy::takeDmg(int dmg)
 {
@@ -187,35 +205,32 @@ void Enemy::updateMovement(Player* player, const float& dt)
 
 	if (this->type == "BLUE_SLIME" && !this->isDeath)
 	{
-		if (abs(player->getPosition().x - this->sprite.getPosition().x) < this->enemyVision.x && abs(player->getPosition().y - this->sprite.getPosition().y) < this->enemyVision.y)
+		if (abs(player->getPosition().x - this->getCenter().x) < this->enemyVision.x && abs(player->getPosition().y - this->getCenter().y) < this->enemyVision.y)
 		{
-			if (this->sprite.getPosition().y - (player->getPosition().y + (player->getGlobalBounds().height / 2.f)) > 0.f)
+			float speed = 1;
+			if (this->getCenter().y - (player->getPosition().y + (player->getGlobalBounds().height / 2.f)) > 0.f)
 			{
-				this->sprite.move(0.f, -0.5f);
+				this->sprite.move(0.f, -speed);
 				this->xAxis = 0;
 				this->yAxis = -1;
-				//this->animationState = SLIME_MOVING_UP;
 			}
-			else if ((player->getPosition().y + (player->getGlobalBounds().height / 2.f)) - this->sprite.getPosition().y > 0.f)
+			else if ((player->getPosition().y + (player->getGlobalBounds().height / 2.f)) - this->getCenter().y > 0.f)
 			{
-				this->sprite.move(0.f, 0.5f);
+				this->sprite.move(0.f, speed);
 				this->xAxis = 0;
 				this->yAxis = 1;
-				//this->animationState = SLIME_MOVING_DOWN;
 			}
-			if (this->sprite.getPosition().x - (player->getPosition().x + (player->getGlobalBounds().width / 2.f)) > 0.f)
+			if (this->getCenter().x - (player->getPosition().x + (player->getGlobalBounds().width / 2.f)) > 0.f)
 			{
-				this->sprite.move(-0.5f, 0.f);
+				this->sprite.move(-speed, 0.f);
 				this->xAxis = -1;
 				this->yAxis = 0;
-				//this->animationState = SLIME_MOVING_LEFT;
 			}
-			else if ((player->getPosition().x + (player->getGlobalBounds().width / 2.f)) - this->sprite.getPosition().x > 0.f)
+			else if ((player->getPosition().x + (player->getGlobalBounds().width / 2.f)) - this->getCenter().x > 0.f)
 			{
-				this->sprite.move(0.5f, 0.f);
+				this->sprite.move(speed, 0.f);
 				this->xAxis = 1;
 				this->yAxis = 0;
-				//this->animationState = SLIME_MOVING_RIGHT;
 			}
 		}
 		else
@@ -226,35 +241,32 @@ void Enemy::updateMovement(Player* player, const float& dt)
 	}
 	if (this->type == "PINK_SLIME" && !this->isDeath)
 	{
-		if (abs(player->getPosition().x - this->sprite.getPosition().x) < this->enemyVision.x && abs(player->getPosition().y - this->sprite.getPosition().y) < this->enemyVision.y)
+		if (abs(player->getPosition().x - this->getCenter().x) < this->enemyVision.x && abs(player->getPosition().y - this->getCenter().y) < this->enemyVision.y)
 		{
-			if (this->sprite.getPosition().y - (player->getPosition().y + (player->getGlobalBounds().height / 2.f)) > 0.f)
+			float speed = 0.5;
+			if (this->getCenter().y - (player->getPosition().y + (player->getGlobalBounds().height / 2.f)) > 0.f)
 			{
-				this->sprite.move(0.f, -0.25f);
+				this->sprite.move(0.f, -speed);
 				this->xAxis = 0;
 				this->yAxis = -1;
-				//this->animationState = SLIME_MOVING_UP;
 			}
-			else if ((player->getPosition().y + (player->getGlobalBounds().height / 2.f)) - this->sprite.getPosition().y > 0.f)
+			else if ((player->getPosition().y + (player->getGlobalBounds().height / 2.f)) - this->getCenter().y > 0.f)
 			{
-				this->sprite.move(0.f, 0.25f);
+				this->sprite.move(0.f, speed);
 				this->xAxis = 0;
 				this->yAxis = 1;
-				//this->animationState = SLIME_MOVING_DOWN;
 			}
-			if (this->sprite.getPosition().x - (player->getPosition().x + (player->getGlobalBounds().width / 2.f)) > 0.f)
+			if (this->getCenter().x - (player->getPosition().x + (player->getGlobalBounds().width / 2.f)) > 0.f)
 			{
-				this->sprite.move(-0.25f, 0.f);
+				this->sprite.move(-speed, 0.f);
 				this->xAxis = -1;
 				this->yAxis = 0;
-				//this->animationState = SLIME_MOVING_LEFT;
 			}
-			else if ((player->getPosition().x + (player->getGlobalBounds().width / 2.f)) - this->sprite.getPosition().x > 0.f)
+			else if ((player->getPosition().x + (player->getGlobalBounds().width / 2.f)) - this->getCenter().x > 0.f)
 			{
-				this->sprite.move(0.25f, 0.f);
+				this->sprite.move(speed, 0.f);
 				this->xAxis = 1;
 				this->yAxis = 0;
-				//this->animationState = SLIME_MOVING_RIGHT;
 			}
 		}
 		else
@@ -263,6 +275,43 @@ void Enemy::updateMovement(Player* player, const float& dt)
 			this->yAxis = 0;
 		}
 	}
+	if (this->type == "YELLOW_SLIME" && !this->isDeath)
+	{
+		if (abs(player->getPosition().x - this->getCenter().x) < this->enemyVision.x && abs(player->getPosition().y - this->getCenter().y) < this->enemyVision.y)
+		{
+			float speed = 1.5;
+			if (this->getCenter().y - (player->getPosition().y + (player->getGlobalBounds().height / 2.f)) > 0.f)
+			{
+				this->sprite.move(0.f, -speed);
+				this->xAxis = 0;
+				this->yAxis = -1;
+			}
+			else if ((player->getPosition().y + (player->getGlobalBounds().height / 2.f)) - this->getCenter().y > 0.f)
+			{
+				this->sprite.move(0.f, speed);
+				this->xAxis = 0;
+				this->yAxis = 1;
+			}
+			if (this->getCenter().x - (player->getPosition().x + (player->getGlobalBounds().width / 2.f)) > 0.f)
+			{
+				this->sprite.move(-speed, 0.f);
+				this->xAxis = -1;
+				this->yAxis = 0;
+			}
+			else if ((player->getPosition().x + (player->getGlobalBounds().width / 2.f)) - this->getCenter().x > 0.f)
+			{
+				this->sprite.move(speed, 0.f);
+				this->xAxis = 1;
+				this->yAxis = 0;
+			}
+		}
+		else
+		{
+			this->xAxis = 0;
+			this->yAxis = 0;
+		}
+	}
+	
 }
 
 void Enemy::updateHitbox()
@@ -297,6 +346,29 @@ void Enemy::updateAnimation(const float& dt)
 		}
 	}
 	if (this->type == "PINK_SLIME")
+	{
+		if (this->xAxis == -1 && this->yAxis == 0)	//LEFT
+		{
+			this->animationComponent->play("MOVE_LEFT", dt);
+		}
+		else if (this->xAxis == 1 && this->yAxis == 0)	//RIGHT
+		{
+			this->animationComponent->play("MOVE_RIGHT", dt);
+		}
+		else if (this->xAxis == 0 && this->yAxis == -1)	//UP
+		{
+			this->animationComponent->play("MOVE_UP", dt);
+		}
+		else if (this->xAxis == 0 && this->yAxis == 1)	//DOWN
+		{
+			this->animationComponent->play("MOVE_DOWN", dt);
+		}
+		if (this->xAxis == 0 && this->yAxis == 0)
+		{
+			this->animationComponent->play("IDLE", dt);
+		}
+	}
+	if (this->type == "YELLOW_SLIME")
 	{
 		if (this->xAxis == -1 && this->yAxis == 0)	//LEFT
 		{

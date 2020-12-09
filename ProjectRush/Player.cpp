@@ -6,7 +6,7 @@ void Player::initVariables()
 {
 	this->sprite = new sf::Sprite;
 	this->animationState = P_IDLE;
-	this->maxHp = 10.f;
+	this->maxHp = 20.f;
 	this->hp = maxHp;
 	this->shootCD = 0.4f;
 	this->name = "";
