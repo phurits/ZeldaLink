@@ -52,6 +52,8 @@ Player::Player()
 	this->animationComponent->addAnimation("WALK_RIGHT", 11.f, 0, 3 , 5, 3, 126, 126);
 	this->animationComponent->addAnimation("WALK_UP", 11.f, 0, 0 , 5, 0, 126, 126);
 	this->animationComponent->addAnimation("WALK_DOWN", 11.f, 0, 2 , 5, 2, 126, 126);
+
+	
 }
 
 Player::~Player()

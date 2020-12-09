@@ -60,19 +60,13 @@ private:
     std::map<std::string, sf::Texture*> textures;
     std::vector<Bullet*> bullets;
     sf::Clock shootTimer;
-    Bullet b1;
 
-    //Bullets
+    //Item
     std::vector<Item*> items;
     std::map<std::string, sf::SoundBuffer*> soundEffects;
 
+    sf::SoundBuffer pickUpItem;
     sf::Sound pickUpItemSound;
-    sf::Sound pickUpBonusItemSound;
-    sf::Sound meleeSound;
-
-    //Platform
-    std::vector<Platform*> platforms;
-    sf::Vector2f direction;
 
     //Initialization
     void initKeybinds();

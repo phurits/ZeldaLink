@@ -1,12 +1,12 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
 
 class Item
 {
 private:
 	sf::Texture texture;
 	sf::RectangleShape shape;
+	sf::RectangleShape hitbox;
 	std::string type;
 
 public:
@@ -14,8 +14,11 @@ public:
 	~Item();
 
 	//Accessors
+	const sf::Vector2f getPosition() const;
 	sf::FloatRect getGlobalBounds();
 	const std::string& getType() const;
+
+	bool isIntersects(sf::FloatRect other);
 
 	//Functions
 	void update();

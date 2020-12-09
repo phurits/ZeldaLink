@@ -70,7 +70,7 @@ void GameplayState::initSoundEffects()
 	if (!this->pShoot.loadFromFile("Resources/Sounds/LTTP_Cane_Magic.wav"))
 		std::cout << "ERROR::PLAYER::COULD NOT LOAD pSHOOT" << std::endl;
 	this->pShootSound.setBuffer(pShoot);
-	this->pShootSound.setVolume(30.f);
+	this->pShootSound.setVolume(20.f);
 
 	if (!this->eDeath.loadFromFile("Resources/Sounds/LTTP_Enemy_Kill.wav"))
 		std::cout << "ERROR::PLAYER::COULD NOT LOAD eDEATH" << std::endl;
@@ -80,12 +80,17 @@ void GameplayState::initSoundEffects()
 	if (!this->eHit.loadFromFile("Resources/Sounds/LTTP_Enemy_Hit.wav"))
 		std::cout << "ERROR::PLAYER::COULD NOT LOAD eHIT" << std::endl;
 	this->eHitSound.setBuffer(eHit);
-	this->eHitSound.setVolume(10.f);
+	this->eHitSound.setVolume(20.f);
 
 	if(!this->pDeath.loadFromFile("Resources/Sounds/LTTP_Link_Fall.wav"))
 		std::cout << "ERROR::PLAYER::COULD NOT LOAD pDEATH" << std::endl;
 	this->pDeathSound.setBuffer(pDeath);
 	this->pDeathSound.setVolume(30.f);
+
+	if (!this->pickUpItem.loadFromFile("Resources/Sounds/LTTP_Rupee1.wav"))
+		std::cout << "ERROR::PLAYER::COULD NOT LOAD pickItem" << std::endl;
+	this->pickUpItemSound.setBuffer(pickUpItem);
+	this->pickUpItemSound.setVolume(20.f);
 
 
 }
@@ -100,6 +105,8 @@ void GameplayState::initTexture()
 	this->textures["PINK_SLIME"]->loadFromFile("Resources/Images/Sprites/Enemy/pink_slime.png");
 	this->textures["YELLOW_SLIME"] = new sf::Texture;
 	this->textures["YELLOW_SLIME"]->loadFromFile("Resources/Images/Sprites/Enemy/yellow_slime.png");
+	this->textures["HEART"] = new sf::Texture;
+	this->textures["HEART"]->loadFromFile("Resources/Images/Items/Heart.png");
 }
 
 void GameplayState::initPlayer()
@@ -129,8 +136,8 @@ void GameplayState::initGUI()
 	this->hpBarOutline.setPosition(10.f, 35.f);
 	this->hpBarOutline.setSize(sf::Vector2f(20.f * this->player->getMaxHp(), 30.f));
 	this->hpBarOutline.setOutlineThickness(1.f);
-	this->hpBarOutline.setOutlineColor(sf::Color::Transparent);
-	this->hpBarOutline.setFillColor(sf::Color(0,0,0,128));
+	this->hpBarOutline.setOutlineColor(sf::Color::Black);
+	this->hpBarOutline.setFillColor(sf::Color(0,0,0,255));
 
 	this->health.setFont(this->font);
 	this->health.setPosition((20.f * this->player->getMaxHp()) / 2, 40.f);
@@ -183,6 +190,14 @@ GameplayState::~GameplayState()
 	{
 		delete enemy;
 	}
+	for (auto* item : this->items)
+	{
+		delete item;
+	}
+	for (auto& i : this->soundEffects)
+	{
+		delete i.second;
+	}
 }
 
 sf::Text GameplayState::getScoreText()
@@ -192,7 +207,6 @@ sf::Text GameplayState::getScoreText()
 
 void GameplayState::endState()
 {
-	
 	std::cout << "Ending Game State!" << "\n";
 }
 
@@ -381,7 +395,19 @@ void GameplayState::updateCollision(const float& dt)
 
 void GameplayState::updateItemsCollision(const float& dt)
 {
-
+	unsigned itemCounter = 0;
+	for (auto* item : this->items)
+	{
+		if (item->getGlobalBounds().intersects(this->player->getHitbox()) && this->player->getHp() < this->player->getMaxHp() && item->getType() == "HEART")
+		{
+			delete this->items.at(itemCounter);
+			this->player->heal(1);
+			this->items.erase(this->items.begin() + itemCounter);
+			this->pickUpItemSound.play();
+			--itemCounter;
+		}
+		++itemCounter;
+	}
 }
 
 void GameplayState::updateBullet(const float& dt)
@@ -441,14 +467,14 @@ void GameplayState::updateBullet(const float& dt)
 				{
 					this->eDeathSound.play();
 					this->player->addScore(enemy->getPoint());
-					//if (enemy->getIsDrop())
-					//	this->items.push_back(new Item(this->textures["HEALTH"], "HEAL", enemy->getPosition().x, enemy->getPosition().y + enemy->getGlobalBounds().height - 40.f));
-						if (enemy->getIsDeath())
-						{
-							delete this->enemies.at(temp);
-							this->enemies.erase(this->enemies.begin() + temp);
-							temp--;
-						}
+					if (enemy->getIsDrop())
+						this->items.push_back(new Item(this->textures["HEART"], "HEART", enemy->getPosition().x, enemy->getPosition().y));
+					if (enemy->getIsDeath())
+					{
+						delete this->enemies.at(temp);
+						this->enemies.erase(this->enemies.begin() + temp);
+						temp--;
+					}
 				}
 				delete this->bullets.at(counter);
 				this->bullets.erase(this->bullets.begin() + counter);
@@ -514,8 +540,8 @@ void GameplayState::renderPlayer()
 
 void GameplayState::renderGUI()
 {
-	this->window->draw(this->hpBar);
 	this->window->draw(this->hpBarOutline);
+	this->window->draw(this->hpBar);
 	this->window->draw(this->health);
 
 	this->window->draw(this->scoreText);
@@ -530,6 +556,10 @@ void GameplayState::render(sf::RenderTarget* target)
 
 	this->window->draw(this->background);	//Render Background
 
+	for (auto* item : this->items)
+	{
+		item->render(this->window);
+	}
 	for (auto* bullet : this->bullets)
 	{
 		bullet->render(this->window);
@@ -538,6 +568,7 @@ void GameplayState::render(sf::RenderTarget* target)
 	{
 		enemy->render(this->window);
 	}
+
 
 	this->renderPlayer();					//Render Player
 

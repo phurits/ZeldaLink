@@ -120,6 +120,7 @@ EnterNameState::~EnterNameState()
 	{
 		delete it->second;
 	}
+
 }
 
 void EnterNameState::endState()

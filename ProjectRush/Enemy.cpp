@@ -7,8 +7,9 @@ void Enemy::initVariables()
 	this->hp = hpMax;
 	this->damage = 1;
 	this->points = 5;
-	this->dropChance = 30;
+	this->dropChance = 20;
 	this->isDeath = false;
+
 	this->enemyVision = sf::Vector2f(800, 800);
 	this->xAxis = 0;
 	this->yAxis = 0;
@@ -159,7 +160,7 @@ sf::Vector2f Enemy::getCenter()
 //Modifiers
 void Enemy::takeDmg(int dmg)
 {
-	//this->takeDmgSound.play();
+	this->takeDmgSound.play();
 	this->sprite.setColor(sf::Color(255, 0, 0, 127));
 	this->hp -= dmg;
 	this->takeDmgTimer.restart();
