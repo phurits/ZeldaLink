@@ -21,6 +21,11 @@ private:
 
 	sf::Music bg_music;
 
+	sf::SoundBuffer enterWord;
+	sf::Sound enterWordSound;
+	sf::SoundBuffer deleteWord;
+	sf::Sound deleteWordSound;
+
 	//Initializer
 	void initVariables();
 	void initMusic();

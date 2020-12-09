@@ -34,7 +34,7 @@ void Player::initSoundEffects()
 	if (!this->takeDmgsfx.loadFromFile("Resources/Sounds/LTTP_Link_Hurt.wav"))
 		std::cout << "ERROR::PLAYER::COULD NOT LOAD FROM FILE PLAYER_TAKE_DMG" << std::endl;
 	this->takeDmgSound.setBuffer(this->takeDmgsfx);
-	this->takeDmgSound.setVolume(50.f);
+	this->takeDmgSound.setVolume(30.f);
 }
 
 //Constructors / Destructors
@@ -170,7 +170,7 @@ void Player::move(const float& dt, const float dir_x, const float dir_y)
 
 void Player::resetToNormal(const float& dt)
 {
-	if (this->takeDmgTimer.getElapsedTime().asSeconds() >= 0.3f)
+	if (this->takeDmgTimer.getElapsedTime().asSeconds() >= 0.15f)
 	{
 		this->sprite->setColor(sf::Color(255, 255, 255, 255));
 	}

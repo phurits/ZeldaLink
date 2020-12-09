@@ -35,6 +35,17 @@ void EnterNameState::initMusic()
 	this->bg_music.setLoop(true);
 	this->bg_music.setVolume(20.f);
 	this->bg_music.play();
+
+	//initSound
+	if (!this->enterWord.loadFromFile("Resources/Sounds/enterWord.ogg"))
+		std::cout << "ERROR::PLAYER::COULD NOT LOAD enterWord" << std::endl;
+	this->enterWordSound.setBuffer(this->enterWord);
+	this->enterWordSound.setVolume(30.f);
+
+	if (!this->deleteWord.loadFromFile("Resources/Sounds/deleteWord.ogg"))
+		std::cout << "ERROR::PLAYER::COULD NOT LOAD delteWord" << std::endl;
+	this->deleteWordSound.setBuffer(this->deleteWord);
+	this->deleteWordSound.setVolume(30.f);
 }
 
 void EnterNameState::initBackground()
@@ -152,6 +163,7 @@ void EnterNameState::update(const float& dt)
 				{
 					this->input.erase(this->input.getSize() - 1);
 					this->nameString.erase(this->nameString.size() - 1);
+					this->deleteWordSound.play();
 				}
 				else
 				{
@@ -160,6 +172,7 @@ void EnterNameState::update(const float& dt)
 						if (this->nameEvent.text.unicode >= 97 && this->nameEvent.text.unicode <= 122)
 						{
 							this->nameEvent.text.unicode -= 32;
+							this->enterWordSound.play();
 						}
 						this->input += this->nameEvent.text.unicode;
 						this->nameString += this->nameEvent.text.unicode;

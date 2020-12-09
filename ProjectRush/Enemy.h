@@ -7,7 +7,7 @@
 #include "Player.h"
 #include "AnimationComponent.h"
 
-enum ENEMY_ANIMATION_STATE { SLIME_IDLE = 0, SLIME_MOVING_LEFT, SLIME_MOVING_RIGHT, SLIME_MOVING_UP, SLIME_MOVING_DOWN, };
+//enum ENEMY_ANIMATION_STATE { SLIME_IDLE = 0, SLIME_MOVING_LEFT, SLIME_MOVING_RIGHT, SLIME_MOVING_UP, SLIME_MOVING_DOWN, };
 
 class Enemy
 {
@@ -23,6 +23,9 @@ private:
 	float dropChance;
 	bool isDrop;
 	bool isDeath;
+
+	short xAxis;
+	short yAxis;
 
 	sf::Vector2f enemyVision;
 

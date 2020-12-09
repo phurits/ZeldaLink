@@ -10,7 +10,8 @@ void Enemy::initVariables()
 	this->dropChance = 30;
 	this->isDeath = false;
 	this->enemyVision = sf::Vector2f(800, 800);
-
+	this->xAxis = 0;
+	this->yAxis = 0;
 }
 
 void Enemy::initSoundEffects()
@@ -25,13 +26,13 @@ void Enemy::initSoundEffects()
 
 void Enemy::initSprite()
 {
-	this->sprite.setScale(1.f, 1.f);
+	this->sprite.setScale(1.f,1.f);
 }
 
 void Enemy::initAnimationComponent()
 {
 	this->createAnimationComponent();
-	this->animationState = SLIME_IDLE;
+	//this->animationState = SLIME_IDLE;
 }
 
 Enemy::Enemy(sf::Texture* texture, std::string type, float pos_x, float pos_y)
@@ -53,17 +54,31 @@ Enemy::Enemy(sf::Texture* texture, std::string type, float pos_x, float pos_y)
 	this->randomItem();
 
 	//Add animations
-	if (this->type == "T_SLIME")
+	if (this->type == "BLUE_SLIME")
 	{
-		this->hitbox = new Hitbox(this->sprite, 0, 0, 36, 27);
+		this->sprite.setScale(1.5f, 1.5f);
+		this->hitbox = new Hitbox(this->sprite, 5, 5, 44, 30);
 		this->hpMax = 2;
 		this->hp = hpMax;
 		this->points = 100;
 		this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 2, 0, 36, 27);
-		this->animationComponent->addAnimation("WALK_LEFT", 10.f, 0, 1, 2, 1, 36, 27);
-		this->animationComponent->addAnimation("WALK_RIGHT", 10.f, 0, 2, 2, 2, 36, 27);
-		this->animationComponent->addAnimation("WALK_UP", 10.f, 0, 3, 2, 3, 36, 27);
-		this->animationComponent->addAnimation("WALK_DOWN", 10.f, 0, 0, 2, 0, 36, 27);
+		this->animationComponent->addAnimation("MOVE_LEFT", 10.f, 0, 1, 2, 1, 36, 27);
+		this->animationComponent->addAnimation("MOVE_RIGHT", 10.f, 0, 2, 2, 2, 36, 27);
+		this->animationComponent->addAnimation("MOVE_UP", 10.f, 0, 3, 2, 3, 36, 27);
+		this->animationComponent->addAnimation("MOVE_DOWN", 10.f, 0, 0, 2, 0, 36, 27);
+	}
+	if (this->type == "PINK_SLIME")
+	{
+		this->sprite.setScale(2.5f, 2.5f);
+		this->hitbox = new Hitbox(this->sprite, 5, 5, 80, 57);
+		this->hpMax = 5;
+		this->hp = hpMax;
+		this->points = 500;
+		this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 2, 0, 36, 27);
+		this->animationComponent->addAnimation("MOVE_LEFT", 10.f, 0, 1, 2, 1, 36, 27);
+		this->animationComponent->addAnimation("MOVE_RIGHT", 10.f, 0, 2, 2, 2, 36, 27);
+		this->animationComponent->addAnimation("MOVE_UP", 10.f, 0, 3, 2, 3, 36, 27);
+		this->animationComponent->addAnimation("MOVE_DOWN", 10.f, 0, 0, 2, 0, 36, 27);
 	}
 }
 
@@ -169,34 +184,83 @@ Collider Enemy::getCollider()
 
 void Enemy::updateMovement(Player* player, const float& dt)
 {
-	if (this->type == "T_SLIME" && !this->isDeath)
+
+	if (this->type == "BLUE_SLIME" && !this->isDeath)
 	{
 		if (abs(player->getPosition().x - this->sprite.getPosition().x) < this->enemyVision.x && abs(player->getPosition().y - this->sprite.getPosition().y) < this->enemyVision.y)
 		{
 			if (this->sprite.getPosition().y - (player->getPosition().y + (player->getGlobalBounds().height / 2.f)) > 0.f)
 			{
 				this->sprite.move(0.f, -0.5f);
-				this->animationState = SLIME_MOVING_UP;
+				this->xAxis = 0;
+				this->yAxis = -1;
+				//this->animationState = SLIME_MOVING_UP;
 			}
 			else if ((player->getPosition().y + (player->getGlobalBounds().height / 2.f)) - this->sprite.getPosition().y > 0.f)
 			{
 				this->sprite.move(0.f, 0.5f);
-				this->animationState = SLIME_MOVING_DOWN;
+				this->xAxis = 0;
+				this->yAxis = 1;
+				//this->animationState = SLIME_MOVING_DOWN;
 			}
 			if (this->sprite.getPosition().x - (player->getPosition().x + (player->getGlobalBounds().width / 2.f)) > 0.f)
 			{
 				this->sprite.move(-0.5f, 0.f);
-				this->animationState = SLIME_MOVING_LEFT;
+				this->xAxis = -1;
+				this->yAxis = 0;
+				//this->animationState = SLIME_MOVING_LEFT;
 			}
 			else if ((player->getPosition().x + (player->getGlobalBounds().width / 2.f)) - this->sprite.getPosition().x > 0.f)
 			{
 				this->sprite.move(0.5f, 0.f);
-				this->animationState = SLIME_MOVING_RIGHT;
+				this->xAxis = 1;
+				this->yAxis = 0;
+				//this->animationState = SLIME_MOVING_RIGHT;
 			}
 		}
 		else
 		{
-			this->animationState = SLIME_IDLE;
+			this->xAxis = 0;
+			this->yAxis = 0;
+		}
+	}
+	if (this->type == "PINK_SLIME" && !this->isDeath)
+	{
+		if (abs(player->getPosition().x - this->sprite.getPosition().x) < this->enemyVision.x && abs(player->getPosition().y - this->sprite.getPosition().y) < this->enemyVision.y)
+		{
+			if (this->sprite.getPosition().y - (player->getPosition().y + (player->getGlobalBounds().height / 2.f)) > 0.f)
+			{
+				this->sprite.move(0.f, -0.25f);
+				this->xAxis = 0;
+				this->yAxis = -1;
+				//this->animationState = SLIME_MOVING_UP;
+			}
+			else if ((player->getPosition().y + (player->getGlobalBounds().height / 2.f)) - this->sprite.getPosition().y > 0.f)
+			{
+				this->sprite.move(0.f, 0.25f);
+				this->xAxis = 0;
+				this->yAxis = 1;
+				//this->animationState = SLIME_MOVING_DOWN;
+			}
+			if (this->sprite.getPosition().x - (player->getPosition().x + (player->getGlobalBounds().width / 2.f)) > 0.f)
+			{
+				this->sprite.move(-0.25f, 0.f);
+				this->xAxis = -1;
+				this->yAxis = 0;
+				//this->animationState = SLIME_MOVING_LEFT;
+			}
+			else if ((player->getPosition().x + (player->getGlobalBounds().width / 2.f)) - this->sprite.getPosition().x > 0.f)
+			{
+				this->sprite.move(0.25f, 0.f);
+				this->xAxis = 1;
+				this->yAxis = 0;
+				//this->animationState = SLIME_MOVING_RIGHT;
+			}
+		}
+		else
+		{
+			this->xAxis = 0;
+			this->yAxis = 0;
 		}
 	}
 }
@@ -209,29 +273,53 @@ void Enemy::updateHitbox()
 
 void Enemy::updateAnimation(const float& dt)
 {
-	if (this->type == "T_SLIME")
+	if (this->type == "BLUE_SLIME")
 	{
-		if (this->animationState == SLIME_IDLE)
+		if (this->xAxis == -1 && this->yAxis == 0)	//LEFT
+		{
+			this->animationComponent->play("MOVE_LEFT", dt);
+		}
+		else if (this->xAxis == 1 && this->yAxis == 0)	//RIGHT
+		{
+			this->animationComponent->play("MOVE_RIGHT", dt);
+		}
+		else if (this->xAxis == 0 && this->yAxis == -1)	//UP
+		{
+			this->animationComponent->play("MOVE_UP", dt);
+		}
+		else if (this->xAxis == 0 && this->yAxis == 1)	//DOWN
+		{
+			this->animationComponent->play("MOVE_DOWN", dt);
+		}
+		if (this->xAxis == 0 && this->yAxis == 0)
 		{
 			this->animationComponent->play("IDLE", dt);
 		}
-		if (this->animationState == SLIME_MOVING_RIGHT)
+	}
+	if (this->type == "PINK_SLIME")
+	{
+		if (this->xAxis == -1 && this->yAxis == 0)	//LEFT
 		{
-			this->animationComponent->play("WALK_RIGHT", dt);
+			this->animationComponent->play("MOVE_LEFT", dt);
 		}
-		if (this->animationState == SLIME_MOVING_LEFT)
+		else if (this->xAxis == 1 && this->yAxis == 0)	//RIGHT
 		{
-			this->animationComponent->play("WALK_LEFT", dt);
+			this->animationComponent->play("MOVE_RIGHT", dt);
 		}
-		if (this->animationState == SLIME_MOVING_UP)
+		else if (this->xAxis == 0 && this->yAxis == -1)	//UP
 		{
-			this->animationComponent->play("WALK_UP", dt);
+			this->animationComponent->play("MOVE_UP", dt);
 		}
-		if (this->animationState == SLIME_MOVING_DOWN)
+		else if (this->xAxis == 0 && this->yAxis == 1)	//DOWN
 		{
-			this->animationComponent->play("WALK_DOWN", dt);
+			this->animationComponent->play("MOVE_DOWN", dt);
+		}
+		if (this->xAxis == 0 && this->yAxis == 0)
+		{
+			this->animationComponent->play("IDLE", dt);
 		}
 	}
+
 }
 
 void Enemy::updateColor()
@@ -240,6 +328,7 @@ void Enemy::updateColor()
 	{
 		this->sprite.setColor(sf::Color(255, 255, 255, 255));
 	}
+
 }
 
 //Functions
@@ -256,5 +345,5 @@ void Enemy::render(sf::RenderTarget* target)
 {
 	target->draw(this->sprite);
 
-	//this->hitbox->render(*target);
+	this->hitbox->render(*target);
 }

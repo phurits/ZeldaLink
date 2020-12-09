@@ -31,8 +31,9 @@ void GameplayState::initVariables()
 	this->score = 0;
 	this->changeColor = 255;
 
-	this->enemyCount = 0;
-	this->enemyMax = 20;
+	this->ttEnemy = 20;
+	this->ttEnemyCount = 0;
+
 	this->spawnRange = sf::Vector2f(1000.f, 1000.f);
 	
 }
@@ -81,8 +82,10 @@ void GameplayState::initTexture()
 {
 	this->textures["FIREBALL"] = new sf::Texture;
 	this->textures["FIREBALL"]->loadFromFile("Resources/Images/Sprites/Bullet/smallFireball.png");
-	this->textures["SLIME"] = new sf::Texture;
-	this->textures["SLIME"]->loadFromFile("Resources/Images/Sprites/Enemy/slime.png");
+	this->textures["BLUE_SLIME"] = new sf::Texture;
+	this->textures["BLUE_SLIME"]->loadFromFile("Resources/Images/Sprites/Enemy/slime.png");
+	this->textures["PINK_SLIME"] = new sf::Texture;
+	this->textures["PINK_SLIME"]->loadFromFile("Resources/Images/Sprites/Enemy/pink_slime.png");
 }
 
 void GameplayState::initPlayer()
@@ -106,17 +109,17 @@ void GameplayState::initGUI()
 {
 	//HEALTHBAR
 	this->hpBar.setPosition(10.f, 35.f);
-	this->hpBar.setSize(sf::Vector2f(10.f * this->player->getHp(), 30.f));
+	this->hpBar.setSize(sf::Vector2f(20.f * this->player->getHp(), 30.f));
 	this->hpBar.setFillColor(sf::Color::Red);
 		//health holder box
 	this->hpBarOutline.setPosition(10.f, 35.f);
-	this->hpBarOutline.setSize(sf::Vector2f(10.f * this->player->getMaxHp(), 30.f));
+	this->hpBarOutline.setSize(sf::Vector2f(20.f * this->player->getMaxHp(), 30.f));
 	this->hpBarOutline.setOutlineThickness(1.f);
 	this->hpBarOutline.setOutlineColor(sf::Color::Transparent);
 	this->hpBarOutline.setFillColor(sf::Color(0,0,0,128));
 
 	this->health.setFont(this->font);
-	this->health.setPosition((10.f * this->player->getMaxHp()) / 2, 40.f);
+	this->health.setPosition((20.f * this->player->getMaxHp()) / 2, 40.f);
 	this->health.setString(std::to_string(this->player->getHp()) + " / " + std::to_string(this->player->getMaxHp()));
 	this->health.setCharacterSize(20.f);
 	this->health.setFillColor(sf::Color::White);
@@ -186,14 +189,21 @@ void GameplayState::spawnEnemies()
 	enemyPos.x = rand() % static_cast<int>(this->background.getGlobalBounds().width - 200) + 100;
 	enemyPos.y = rand() % static_cast<int>(this->background.getGlobalBounds().height - 200) + 100;
 
+	
 		//CHECK DISTANCE BETWEEN PLAYER AND ENEMY
 	if (abs(this->player->getPosition().x - enemyPos.x) > this->spawnRange.x || abs(this->player->getPosition().y - enemyPos.y) > this->spawnRange.y)
 	{
-		if (this->enemyCount < this->enemyMax)
+		if (this->ttEnemyCount < this->ttEnemy)
 		{
-			this->enemies.push_back(new Enemy(this->textures["SLIME"], "T_SLIME", enemyPos.x, enemyPos.y));
-			this->enemyCount++;
+			this->enemies.push_back(new Enemy(this->textures["BLUE_SLIME"], "BLUE_SLIME", enemyPos.x, enemyPos.y));
+			this->blueCount++;
 		}
+		if (this->blueCount % 3 == 1)
+		{
+			this->enemies.push_back(new Enemy(this->textures["PINK_SLIME"], "PINK_SLIME", enemyPos.x, enemyPos.y));
+			this->blueCount = 0;
+		}
+		this->ttEnemyCount++;
 	}
 	
 }
@@ -300,7 +310,7 @@ void GameplayState::updateEnemy(const float& dt)
 				delete this->enemies.at(temp);
 				this->enemies.erase(this->enemies.begin() + temp);
 				temp--;
-				this->enemyCount--;
+				this->ttEnemyCount--;
 			}
 		}
 		temp++;
