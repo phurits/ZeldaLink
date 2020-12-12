@@ -30,8 +30,8 @@ void MainMenuState::initBackground()
 	}
 
 	this->background.setTexture(&this->backgroundTexture);
-	this->background.setOrigin(this->window->getSize().x / 2, this->window->getSize().y / 2);
-	this->background.setPosition(this->view->getCenter());
+	//this->background.setOrigin(this->window->getSize().x / 2, this->window->getSize().y / 2);
+	//this->background.setPosition(this->view->getCenter());
 	//this->background.setPosition(this->view->getCenter().x - this->window->getSize().x / 2.f, this->view->getCenter().y - this->window->getSize().y / 2.f);
 }
 
@@ -155,10 +155,12 @@ void MainMenuState::update(const float& dt)
 	this->updateMousePosition();
 	this->updateInput(dt);
 	this->updateButtons();
+
+	this->window->setView(*this->view);
 	
 	//this->view->setCenter(800, 450);
-	std::cout << this->view->getCenter().x << " " << this->view->getCenter().y << 
-		" " << this->background.getPosition().x << " " << this->background.getPosition().y << "\n";
+	//std::cout << this->view->getCenter().x << " " << this->view->getCenter().y << 
+	//	" " << this->background.getPosition().x << " " << this->background.getPosition().y << "\n";
 	//std::cout << this->mousePosView.x << " " << this->mousePosView.y << std::endl;
 }
 

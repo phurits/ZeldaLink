@@ -26,9 +26,12 @@ void Game::initWindow()
 
 	config.close();
 
+	this->view.setSize(this->windowBounds.width , this->windowBounds.height);
+
 	this->window = new sf::RenderWindow(this->windowBounds, title, sf::Style::Close | sf::Style::Resize);
 	this->window->setFramerateLimit(framelate_limit);
 	this->window->setVerticalSyncEnabled(vertical_sync_enabled);
+	std::cout << this->view.getCenter().x << " " << this->view.getCenter().y << "\n";
 }
 
 void Game::initVariables()

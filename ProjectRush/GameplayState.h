@@ -118,6 +118,7 @@ public:
     void updateBullet(const float& dt);
     void updateGUI(const float& dt);
     void updateToNextState(const float& dt);
+    void cheat(const float& dt);
     void update(const float& dt);
 
     //Render

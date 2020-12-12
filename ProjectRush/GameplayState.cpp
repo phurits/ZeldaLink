@@ -629,13 +629,39 @@ void GameplayState::updateGUI(const float& dt)
 
 void GameplayState::updateToNextState(const float& dt)
 {
+	
 	if (this->player->getHp() <= 0)
 	{
+		this->player->setPosition(0, 0);
 		this->pDeathSound.play();
 		this->bg_music.pause();
 		if (!this->states->empty())
 			this->states->pop();
 		this->states->push(new GameOverState(this->window, this->supportedKeys, this->states, this->view, this->player));
+	}
+}
+
+void GameplayState::cheat(const float& dt)
+{
+	//GAME OVER
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Equal) && sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+	{
+		this->player->takeDmg(999);
+	}
+	//SPAWN PURPLE_POTION
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+	{
+		this->items.push_back(new Item(this->textures["PURPLE_POTION"], "FIRE_RATE", enemyPos.x, enemyPos.y));
+	}
+	//SPAWN RED_POTION
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+	{
+		this->items.push_back(new Item(this->textures["RED_POTION"], "DMG_BOOST", enemyPos.x, enemyPos.y));
+	}
+	//SPAWN YELLOW_POTION
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+	{
+		this->items.push_back(new Item(this->textures["YELLOW_POTION"], "SPEED_BOOST", enemyPos.x, enemyPos.y));
 	}
 }
 
@@ -654,7 +680,12 @@ void GameplayState::update(const float& dt)
 
 	this->updateView(dt);
 	this->updateGUI(dt);
+
+	this->cheat(dt);
+
 	this->updateToNextState(dt);
+
+	
 
 	//std::cout << this->view->getCenter().x << " " << this->view->getCenter().y << "\n";
 }
