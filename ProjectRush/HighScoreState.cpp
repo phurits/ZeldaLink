@@ -132,8 +132,10 @@ void HighScoreState::updateButtons()
 	//BACK TO MAIN MENU
 	if (this->buttons["MAIN_MENU"]->isPressed())
 	{
-		this->bg_music.pause();
-		this->quit = true;
+		//this->bg_music.pause();
+		this->bg_music.stop();
+		this->endState();
+		this->states->push(new MainMenuState(this->window, this->supportedKeys, this->states, this->view, this->player));
 	}
 }
 

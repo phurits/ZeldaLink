@@ -47,6 +47,7 @@ private:
     std::vector<Enemy*> enemies;
     sf::Vector2f enemyDirection;
     sf::Vector2f spawnRange;
+    sf::Vector2f enemyPos;
 
     int enemyKillCount;
     int blueAmount;
@@ -55,6 +56,17 @@ private:
     int pinkMax;
     int yellowAmount;
     int yellowMax;
+
+    //GEMS
+    int greenGemAmount;
+    int greenGemMax;
+    int greenGemPoint;
+    int blueGemAmount;
+    int blueGemMax;
+    int blueGemPoint;
+    int redGemAmount;
+    int redGemMax;
+    int redGemPoint;
    
     //Bullets
     std::map<std::string, sf::Texture*> textures;

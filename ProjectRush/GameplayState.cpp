@@ -46,8 +46,20 @@ void GameplayState::initVariables()
 	this->yellowAmount = 0;
 	this->yellowMax = 5;
 
-	this->spawnRange = sf::Vector2f(1000.f, 1000.f);
+	//GEMS
+	this->greenGemAmount = 0;
+	this->greenGemMax = 30;
+	this->greenGemPoint = 50;
+
+	this->blueGemAmount = 0;
+	this->blueGemMax = 20;
+	this->blueGemPoint = 100;
+
+	this->redGemAmount = 0;
+	this->redGemMax = 10;
+	this->redGemPoint = 200;
 	
+	this->spawnRange = sf::Vector2f(800.f, 800.f);
 }
 
 void GameplayState::initBackground()
@@ -97,16 +109,31 @@ void GameplayState::initSoundEffects()
 
 void GameplayState::initTexture()
 {
+	//BULLET
 	this->textures["FIREBALL"] = new sf::Texture;
 	this->textures["FIREBALL"]->loadFromFile("Resources/Images/Sprites/Bullet/smallFireball.png");
+	//ENEMY
 	this->textures["BLUE_SLIME"] = new sf::Texture;
 	this->textures["BLUE_SLIME"]->loadFromFile("Resources/Images/Sprites/Enemy/blue_slime.png");
 	this->textures["PINK_SLIME"] = new sf::Texture;
 	this->textures["PINK_SLIME"]->loadFromFile("Resources/Images/Sprites/Enemy/pink_slime.png");
 	this->textures["YELLOW_SLIME"] = new sf::Texture;
 	this->textures["YELLOW_SLIME"]->loadFromFile("Resources/Images/Sprites/Enemy/yellow_slime.png");
+	//HEATH
 	this->textures["HEART"] = new sf::Texture;
 	this->textures["HEART"]->loadFromFile("Resources/Images/Items/Heart.png");
+	//ITEM DROP
+	this->textures["RED_POTION"] = new sf::Texture;
+	this->textures["RED_POTION"]->loadFromFile("Resources/Images/Items/red_potion.png");
+	this->textures["PURPLE_POTION"] = new sf::Texture;
+	this->textures["PURPLE_POTION"]->loadFromFile("Resources/Images/Items/purple_potion.png");
+	//COIN
+	this->textures["GREEN_GEM"] = new sf::Texture;
+	this->textures["GREEN_GEM"]->loadFromFile("Resources/Images/Items/green_rupee.png");
+	this->textures["BLUE_GEM"] = new sf::Texture;
+	this->textures["BLUE_GEM"]->loadFromFile("Resources/Images/Items/blue_rupee.png");
+	this->textures["RED_GEM"] = new sf::Texture;
+	this->textures["RED_GEM"]->loadFromFile("Resources/Images/Items/red_rupee.png");
 }
 
 void GameplayState::initPlayer()
@@ -138,7 +165,7 @@ void GameplayState::initGUI()
 	this->hpBarOutline.setOutlineThickness(1.f);
 	this->hpBarOutline.setOutlineColor(sf::Color::Black);
 	this->hpBarOutline.setFillColor(sf::Color(0,0,0,255));
-
+		//health font
 	this->health.setFont(this->font);
 	this->health.setPosition((20.f * this->player->getMaxHp()) / 2, 40.f);
 	this->health.setString(std::to_string(this->player->getHp()) + " / " + std::to_string(this->player->getMaxHp()));
@@ -146,7 +173,7 @@ void GameplayState::initGUI()
 	this->health.setFillColor(sf::Color::White);
 	this->health.setOutlineThickness(1.f);
 
-
+	//SCORE
 	this->scoreText.setFont(this->font);
 	this->scoreText.setLetterSpacing(2.f);
 	this->scoreText.setString(std::to_string(this->player->getScore()));
@@ -213,31 +240,60 @@ void GameplayState::endState()
 void GameplayState::spawnEnemies()
 {
 	//ENEMY SPAWN RANDOM!
-	sf::Vector2f enemyPos;
 	enemyPos.x = rand() % static_cast<int>(this->background.getGlobalBounds().width - 200) + 100;
 	enemyPos.y = rand() % static_cast<int>(this->background.getGlobalBounds().height - 200) + 100;
 
-	
+	int randomItem = rand();
+
 		//CHECK DISTANCE BETWEEN PLAYER AND ENEMY
 	if (abs(this->player->getPosition().x - enemyPos.x) > this->spawnRange.x || abs(this->player->getPosition().y - enemyPos.y) > this->spawnRange.y)
 	{
+		//Coins
+		if (this->greenGemAmount < this->greenGemMax)
+		{
+			this->items.push_back(new Item(this->textures["GREEN_GEM"], "GREEN_GEM", enemyPos.x, enemyPos.y));
+			this->greenGemAmount++;
+		}
+		else if (this->blueGemAmount < this->blueGemMax)
+		{
+			this->items.push_back(new Item(this->textures["BLUE_GEM"], "BLUE_GEM", enemyPos.x, enemyPos.y));
+			this->blueGemAmount++;
+		}
+		else if (this->redGemAmount < this->redGemMax)
+		{
+			this->items.push_back(new Item(this->textures["RED_GEM"], "RED_GEM", enemyPos.x, enemyPos.y));
+			this->redGemAmount++;
+		}
+		//ENEMIES
 		if (this->blueAmount < this->blueMax)
 		{
 			this->enemies.push_back(new Enemy(this->textures["BLUE_SLIME"], "BLUE_SLIME", enemyPos.x, enemyPos.y));
 			this->blueAmount++;
 		}
-		if (this->pinkAmount < this->pinkMax)
+		else if (this->pinkAmount < this->pinkMax)
 		{
 			this->enemies.push_back(new Enemy(this->textures["PINK_SLIME"], "PINK_SLIME", enemyPos.x, enemyPos.y));
 			this->pinkAmount++;
 		}
-		if (this->yellowAmount < this->yellowMax)
+		else if (this->yellowAmount < this->yellowMax)
 		{
 			this->enemies.push_back(new Enemy(this->textures["YELLOW_SLIME"], "YELLOW_SLIME", enemyPos.x, enemyPos.y));
 			this->yellowAmount++;
 		}
+		//ITEM DROP EVERY 20 ENEMY DIE
+		if (this->enemyKillCount == 20)
+		{
+			if (randomItem % 2 == 0)
+			{
+				this->items.push_back(new Item(this->textures["PURPLE_POTION"], "FIRE_RATE", enemyPos.x, enemyPos.y));
+			}
+			else if(randomItem % 2 == 1)
+			{
+				this->items.push_back(new Item(this->textures["RED_POTION"], "DMG_BOOST", enemyPos.x, enemyPos.y));
+			}
+			this->enemyKillCount = 0;
+		}
 	}
-	
 }
 
 void GameplayState::updateView(const float& dt)
@@ -276,7 +332,7 @@ void GameplayState::updateInput(const float& dt)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
-		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getShootCD())
+		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getFirerate())
 		{
 			this->pShootSound.play();
 			this->bullets.push_back(new Bullet(this->textures["FIREBALL"], 
@@ -288,7 +344,7 @@ void GameplayState::updateInput(const float& dt)
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
-		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getShootCD())
+		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getFirerate())
 		{
 			this->pShootSound.play();
 			this->bullets.push_back(new Bullet(this->textures["FIREBALL"],
@@ -300,7 +356,7 @@ void GameplayState::updateInput(const float& dt)
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
-		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getShootCD())
+		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getFirerate())
 		{
 			this->pShootSound.play();
 			this->bullets.push_back(new Bullet(this->textures["FIREBALL"],
@@ -312,7 +368,7 @@ void GameplayState::updateInput(const float& dt)
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
-		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getShootCD())
+		if (this->shootTimer.getElapsedTime().asSeconds() >= this->player->getFirerate())
 		{
 			this->pShootSound.play();
 			this->bullets.push_back(new Bullet(this->textures["FIREBALL"],
@@ -345,7 +401,7 @@ void GameplayState::updateEnemy(const float& dt)
 					this->pinkAmount--;
 				else if (enemy->getType() == "YELLOW_SLIME")
 					this->yellowAmount--;
-
+				this->enemyKillCount++;
 				delete this->enemies.at(temp);
 				this->enemies.erase(this->enemies.begin() + temp);
 				temp--;
@@ -376,6 +432,7 @@ void GameplayState::updateCollision(const float& dt)
 		this->player->setPosition(this->player->getPosition().x, this->background.getGlobalBounds().height - this->player->getGlobalBounds().height);
 	}
 
+	//Check collistion btw player & enemy
 	for (auto* enemy : this->enemies)
 	{
 		if (this->player->getHitbox().intersects(enemy->getHitbox()) && enemy->getHp() > 0)
@@ -398,10 +455,54 @@ void GameplayState::updateItemsCollision(const float& dt)
 	unsigned itemCounter = 0;
 	for (auto* item : this->items)
 	{
+		//HEART
 		if (item->getGlobalBounds().intersects(this->player->getHitbox()) && this->player->getHp() < this->player->getMaxHp() && item->getType() == "HEART")
 		{
 			delete this->items.at(itemCounter);
 			this->player->heal(1);
+			this->items.erase(this->items.begin() + itemCounter);
+			this->pickUpItemSound.play();
+			--itemCounter;
+		}
+		//RED POTIONS = DMG BOOST
+		if (item->getGlobalBounds().intersects(this->player->getHitbox()) && item->getType() == "DMG_BOOST")
+		{
+			delete this->items.at(itemCounter);
+			this->player->boostDMG();
+			this->items.erase(this->items.begin() + itemCounter);
+			this->pickUpItemSound.play();
+			--itemCounter;
+		}
+		//BLUE POTION = FIRERATE BOOST
+		if (item->getGlobalBounds().intersects(this->player->getHitbox()) && item->getType() == "FIRE_RATE" )
+		{
+			delete this->items.at(itemCounter);
+			this->player->reduceFirerateCDR();
+			this->items.erase(this->items.begin() + itemCounter);
+			this->pickUpItemSound.play();
+			--itemCounter;
+		}
+		//GEM
+		if (item->getGlobalBounds().intersects(this->player->getHitbox()) && item->getType() == "GREEN_GEM")
+		{
+			delete this->items.at(itemCounter);
+			this->player->addScore(this->greenGemPoint);
+			this->items.erase(this->items.begin() + itemCounter);
+			this->pickUpItemSound.play();
+			--itemCounter;
+		}
+		if (item->getGlobalBounds().intersects(this->player->getHitbox()) && item->getType() == "BLUE_GEM")
+		{
+			delete this->items.at(itemCounter);
+			this->player->addScore(this->blueGemPoint);
+			this->items.erase(this->items.begin() + itemCounter);
+			this->pickUpItemSound.play();
+			--itemCounter;
+		}
+		if (item->getGlobalBounds().intersects(this->player->getHitbox()) && item->getType() == "RED_GEM")
+		{
+			delete this->items.at(itemCounter);
+			this->player->addScore(this->redGemPoint);
 			this->items.erase(this->items.begin() + itemCounter);
 			this->pickUpItemSound.play();
 			--itemCounter;
@@ -457,13 +558,13 @@ void GameplayState::updateBullet(const float& dt)
 		//check if bullet hit the enemy(ies)
 		for (auto* enemy : this->enemies)
 		{
-			if (bullet->getBounds().intersects(enemy->getGlobalBounds()) && enemy->getHp() > 0)
+			if (bullet->getBounds().intersects(enemy->getHitbox()) && enemy->getHp() > 0)
 			{
 				this->eHitSound.play();
 				//std::cout << enemy->getHp() << std::endl;
-				enemy->takeDmg(1);
+				enemy->takeDmg(this->player->getPlayerDmg());
 				////if enemy's hp is 0
-				if (enemy->getHp() == 0)
+				if (enemy->getHp() <= 0)
 				{
 					this->eDeathSound.play();
 					this->player->addScore(enemy->getPoint());
@@ -480,7 +581,7 @@ void GameplayState::updateBullet(const float& dt)
 				this->bullets.erase(this->bullets.begin() + counter);
 				--counter;
 			}
-			//temp++;
+			temp++;
 		}
 		++counter;
 	}
@@ -523,7 +624,6 @@ void GameplayState::update(const float& dt)
 	this->updateItemsCollision(dt);
 	this->updateBullet(dt);
 	this->updatePlayer(dt);
-
 	this->updateEnemy(dt);
 
 	this->updateView(dt);

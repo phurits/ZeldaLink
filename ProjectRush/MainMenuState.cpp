@@ -7,6 +7,8 @@
 void MainMenuState::initVariables()
 {
 	this->view->setCenter(this->window->getSize().x / 2, this->window->getSize().y / 2);
+	
+	std::cout << "THIS VIEW IS GET INIT SET CENTER" << "\n";
 }
 
 void MainMenuState::initMusic()
@@ -119,6 +121,7 @@ void MainMenuState::updateButtons()
 	if (this->buttons["NAME_ENTER"]->isPressed())
 	{
 		this->bg_music.stop();
+		this->endState();
 		this->states->push(new EnterNameState(this->window, this->supportedKeys, this->states, this->view, this->player));
 	}
 
@@ -126,12 +129,14 @@ void MainMenuState::updateButtons()
 	if (this->buttons["HIGHSCORE_STATE"]->isPressed())
 	{
 		this->bg_music.stop();
+		this->endState();
 		this->states->push(new HighScoreState(this->window, this->supportedKeys, this->states, this->view, this->player));
 	}
 
 	//Quit
 	if (this->buttons["EXIT_STATE"]->isPressed())
 	{
+		this->endState();
 		this->quit = true;
 	}
 }
@@ -150,8 +155,10 @@ void MainMenuState::update(const float& dt)
 	this->updateMousePosition();
 	this->updateInput(dt);
 	this->updateButtons();
-
-	std::cout << this->view->getCenter().x << " " << this->view->getCenter().y << "\n";
+	
+	//this->view->setCenter(800, 450);
+	std::cout << this->view->getCenter().x << " " << this->view->getCenter().y << 
+		" " << this->background.getPosition().x << " " << this->background.getPosition().y << "\n";
 	//std::cout << this->mousePosView.x << " " << this->mousePosView.y << std::endl;
 }
 

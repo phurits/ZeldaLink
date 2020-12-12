@@ -15,7 +15,6 @@ void Game::initWindow()
 	this->windowBounds.height = 900;
 	unsigned framelate_limit = 60;
 	bool vertical_sync_enabled = false;
-	this->view.setCenter(this->windowBounds.width / 2, this->windowBounds.height / 2);
 
 	if (config.is_open())
 	{

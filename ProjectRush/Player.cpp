@@ -8,7 +8,8 @@ void Player::initVariables()
 	this->animationState = P_IDLE;
 	this->maxHp = 20.f;
 	this->hp = maxHp;
-	this->shootCD = 0.4f;
+	this->firerate = 0.4f;
+	this->playerDmg = 1;
 	this->name = "";
 	
 }
@@ -52,8 +53,6 @@ Player::Player()
 	this->animationComponent->addAnimation("WALK_RIGHT", 11.f, 0, 3 , 5, 3, 126, 126);
 	this->animationComponent->addAnimation("WALK_UP", 11.f, 0, 0 , 5, 0, 126, 126);
 	this->animationComponent->addAnimation("WALK_DOWN", 11.f, 0, 2 , 5, 2, 126, 126);
-
-	
 }
 
 Player::~Player()
@@ -98,14 +97,38 @@ const int& Player::getMaxHp() const
 	return this->maxHp;
 }
 
-const float& Player::getShootCD() const
+const float& Player::getFirerate() const
 {
-	return this->shootCD;
+	return this->firerate;
 }
 
-const bool& Player::getBonusState() const
+const bool& Player::getFirerateState() const
 {
-	return this->BonusState;
+	return this->firerateState;
+}
+
+const int& Player::getPlayerDmg() const
+{
+	return this->playerDmg;
+}
+
+const bool& Player::getDmgBoostState() const
+{
+	return this->DmgBoostState;
+}
+
+void Player::boostDMG()
+{
+	this->playerDmg = 3;
+	this->DmgBoostState = true;
+	this->dmgBoostTimer.restart();
+}
+
+void Player::reduceFirerateCDR()
+{
+	this->firerate = 0.2f;
+	this->firerateState = true;
+	this->firerateCDRTimer.restart();
 }
 
 const int& Player::getScore() const
@@ -138,12 +161,7 @@ void Player::heal(int x)
 	this->hp += x;
 }
 
-void Player::reduceShootCD()
-{
-	this->shootCD = 0.2f;
-	//this->BonusState = true;
-	this->shootCDTimer.restart();
-}
+
 
 void Player::addScore(int x)
 {
@@ -175,6 +193,16 @@ void Player::resetToNormal(const float& dt)
 	if (this->takeDmgTimer.getElapsedTime().asSeconds() >= 0.15f)
 	{
 		this->sprite->setColor(sf::Color(255, 255, 255, 255));
+	}
+	if (this->firerateCDRTimer.getElapsedTime().asSeconds() >= 5.f && this->firerateState)
+	{
+		this->firerate = 0.4f;
+		this->firerateState = false;
+	}
+	if(this->dmgBoostTimer.getElapsedTime().asSeconds() >= 5.f && this->DmgBoostState)
+	{
+		this->playerDmg = 1;
+		this->DmgBoostState = false;
 	}
 }
 

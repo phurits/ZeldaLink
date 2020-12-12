@@ -23,9 +23,13 @@ private:
 	int score;
 
 	//Event stuff (when pick up items)
-	float shootCD;
-	bool BonusState;
-	sf::Clock shootCDTimer;
+	float firerate;
+	bool firerateState;
+	sf::Clock firerateCDRTimer;
+
+	int playerDmg;
+	bool DmgBoostState;
+	sf::Clock dmgBoostTimer;
 
 	//Hitbox
 	Hitbox* hitbox;
@@ -59,19 +63,25 @@ public:
 	sf::Sprite& getSprite();
 	const sf::FloatRect getHitbox() const;
 	short getAnimationState();
-	const float& getShootCD() const;
 	int getHp();
 	const int& getMaxHp() const;
-	const bool& getBonusState() const;
 	const int& getScore() const;
 	Collider getCollider();
 	std::string getName();
+
+	//FIRERATE REDUCTION
+	const float& getFirerate() const;
+	const bool& getFirerateState() const;
+	void reduceFirerateCDR();
+
+	const int& getPlayerDmg() const;
+	const bool& getDmgBoostState() const;
+	void boostDMG();
 
 	//Modifiers
 	void setPosition(const float x, const float y);
 	void takeDmg(int dmg);
 	void heal(int x);
-	void reduceShootCD();
 	void addScore(int x);
 	void setName(std::string name);
 
