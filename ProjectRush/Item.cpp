@@ -27,6 +27,11 @@ Item::Item(sf::Texture* texture, std::string type, float x, float y)
 		this->shape.setSize(sf::Vector2f(50.f, 75.f));
 			this->hitbox.setSize(this->shape.getSize());
 	}
+	if (this->type == "SPEED_BOOST")
+	{
+		this->shape.setSize(sf::Vector2f(50.f, 75.f));
+		this->hitbox.setSize(this->shape.getSize());
+	}
 	if (this->type == "GREEN_GEM")
 	{
 		this->shape.setSize(sf::Vector2f(25.f, 40.f));

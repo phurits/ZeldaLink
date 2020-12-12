@@ -11,6 +11,8 @@ void Enemy::initVariables()
 	this->isDeath = false;
 
 	this->enemyVision = sf::Vector2f(800, 800);
+
+	this->speed = 1.f;
 	this->xAxis = 0;
 	this->yAxis = 0;
 }
@@ -157,6 +159,11 @@ sf::Vector2f Enemy::getCenter()
 	return sf::Vector2f(this->sprite.getGlobalBounds().left + (this->sprite.getGlobalBounds().width / 2), this->sprite.getGlobalBounds().top + (this->sprite.getGlobalBounds().height / 2));
 }
 
+float Enemy::getSpeed()
+{
+	return this->speed;
+}
+
 //Modifiers
 void Enemy::takeDmg(int dmg)
 {
@@ -164,6 +171,11 @@ void Enemy::takeDmg(int dmg)
 	this->sprite.setColor(sf::Color(255, 0, 0, 127));
 	this->hp -= dmg;
 	this->takeDmgTimer.restart();
+}
+
+void Enemy::setSpeed(float speed)
+{
+	this->speed = speed;
 }
 
 void Enemy::setPosition(float pos_x, float pos_y)
@@ -208,7 +220,7 @@ void Enemy::updateMovement(Player* player, const float& dt)
 	{
 		if (abs(player->getPosition().x - this->getCenter().x) < this->enemyVision.x && abs(player->getPosition().y - this->getCenter().y) < this->enemyVision.y)
 		{
-			float speed = 1;
+			this->speed = 1;
 			if (this->getCenter().y - (player->getPosition().y + (player->getGlobalBounds().height / 2.f)) > 0.f)
 			{
 				this->sprite.move(0.f, -speed);
@@ -244,7 +256,7 @@ void Enemy::updateMovement(Player* player, const float& dt)
 	{
 		if (abs(player->getPosition().x - this->getCenter().x) < this->enemyVision.x && abs(player->getPosition().y - this->getCenter().y) < this->enemyVision.y)
 		{
-			float speed = 0.5;
+			this->speed = 0.5;
 			if (this->getCenter().y - (player->getPosition().y + (player->getGlobalBounds().height / 2.f)) > 0.f)
 			{
 				this->sprite.move(0.f, -speed);
@@ -280,7 +292,7 @@ void Enemy::updateMovement(Player* player, const float& dt)
 	{
 		if (abs(player->getPosition().x - this->getCenter().x) < this->enemyVision.x && abs(player->getPosition().y - this->getCenter().y) < this->enemyVision.y)
 		{
-			float speed = 1.5;
+			this->speed = 1.5;
 			if (this->getCenter().y - (player->getPosition().y + (player->getGlobalBounds().height / 2.f)) > 0.f)
 			{
 				this->sprite.move(0.f, -speed);
@@ -418,5 +430,5 @@ void Enemy::render(sf::RenderTarget* target)
 {
 	target->draw(this->sprite);
 
-	this->hitbox->render(*target);
+	//this->hitbox->render(*target);
 }

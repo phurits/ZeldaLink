@@ -31,6 +31,8 @@ void GameplayState::initVariables()
 	this->score = 0;
 	this->changeColor = 255;
 
+	this->spawnRange = sf::Vector2f(800.f, 800.f);
+
 	//Enemy Kill Total
 	this->enemyKillCount = 0;
 
@@ -58,8 +60,10 @@ void GameplayState::initVariables()
 	this->redGemAmount = 0;
 	this->redGemMax = 10;
 	this->redGemPoint = 200;
+
+	this->numberItems = 3;
 	
-	this->spawnRange = sf::Vector2f(800.f, 800.f);
+
 }
 
 void GameplayState::initBackground()
@@ -104,6 +108,11 @@ void GameplayState::initSoundEffects()
 	this->pickUpItemSound.setBuffer(pickUpItem);
 	this->pickUpItemSound.setVolume(20.f);
 
+	if (!this->coin.loadFromFile("Resources/Sounds/coin.ogg"))
+		std::cout << "ERROR::PLAYER::COULD NOT LOAD pick Coin" << std::endl;
+	this->coinSound.setBuffer(coin);
+	this->coinSound.setVolume(20.f);
+
 
 }
 
@@ -127,6 +136,8 @@ void GameplayState::initTexture()
 	this->textures["RED_POTION"]->loadFromFile("Resources/Images/Items/red_potion.png");
 	this->textures["PURPLE_POTION"] = new sf::Texture;
 	this->textures["PURPLE_POTION"]->loadFromFile("Resources/Images/Items/purple_potion.png");
+	this->textures["YELLOW_POTION"] = new sf::Texture;
+	this->textures["YELLOW_POTION"]->loadFromFile("Resources/Images/Items/yellow_potion.png");
 	//COIN
 	this->textures["GREEN_GEM"] = new sf::Texture;
 	this->textures["GREEN_GEM"]->loadFromFile("Resources/Images/Items/green_rupee.png");
@@ -139,7 +150,7 @@ void GameplayState::initTexture()
 void GameplayState::initPlayer()
 {
 	//random player spawn postion
-	this->player->setPosition(static_cast<float>(rand() % 2360) + 100.f, static_cast<float>(rand() % 2360) + 100.f);
+	this->player->setPosition(static_cast<float>(rand() % 2800) + 100.f, static_cast<float>(rand() % 2800) + 100.f);
 }
 
 void GameplayState::initItem()
@@ -281,15 +292,20 @@ void GameplayState::spawnEnemies()
 			this->yellowAmount++;
 		}
 		//ITEM DROP EVERY 20 ENEMY DIE
+		
 		if (this->enemyKillCount == 20)
 		{
-			if (randomItem % 2 == 0)
+			if (randomItem % this->numberItems == 0)
 			{
 				this->items.push_back(new Item(this->textures["PURPLE_POTION"], "FIRE_RATE", enemyPos.x, enemyPos.y));
 			}
-			else if(randomItem % 2 == 1)
+			else if(randomItem % this->numberItems == 1)
 			{
 				this->items.push_back(new Item(this->textures["RED_POTION"], "DMG_BOOST", enemyPos.x, enemyPos.y));
+			}
+			else if (randomItem % this->numberItems == 2)
+			{
+				this->items.push_back(new Item(this->textures["YELLOW_POTION"], "SPEED_BOOST", enemyPos.x, enemyPos.y));
 			}
 			this->enemyKillCount = 0;
 		}
@@ -445,6 +461,7 @@ void GameplayState::updateCollision(const float& dt)
 			enemy->takeDmg(999);
 		}
 	}
+
 	//DEBUG PLAYER POSITION
 	//std::cout << this->player->getPosition().x << " " << this->player->getPosition().y << "\n";
 	
@@ -482,13 +499,22 @@ void GameplayState::updateItemsCollision(const float& dt)
 			this->pickUpItemSound.play();
 			--itemCounter;
 		}
+		//YELLOW POTION = SPEED BOOST
+		if (item->getGlobalBounds().intersects(this->player->getHitbox()) && item->getType() == "SPEED_BOOST")
+		{
+			delete this->items.at(itemCounter);
+			this->player->speedBoost();
+			this->items.erase(this->items.begin() + itemCounter);
+			this->pickUpItemSound.play();
+			--itemCounter;
+		}
 		//GEM
 		if (item->getGlobalBounds().intersects(this->player->getHitbox()) && item->getType() == "GREEN_GEM")
 		{
 			delete this->items.at(itemCounter);
 			this->player->addScore(this->greenGemPoint);
 			this->items.erase(this->items.begin() + itemCounter);
-			this->pickUpItemSound.play();
+			this->coinSound.play();
 			--itemCounter;
 		}
 		if (item->getGlobalBounds().intersects(this->player->getHitbox()) && item->getType() == "BLUE_GEM")
@@ -496,7 +522,7 @@ void GameplayState::updateItemsCollision(const float& dt)
 			delete this->items.at(itemCounter);
 			this->player->addScore(this->blueGemPoint);
 			this->items.erase(this->items.begin() + itemCounter);
-			this->pickUpItemSound.play();
+			this->coinSound.play();
 			--itemCounter;
 		}
 		if (item->getGlobalBounds().intersects(this->player->getHitbox()) && item->getType() == "RED_GEM")
@@ -504,7 +530,7 @@ void GameplayState::updateItemsCollision(const float& dt)
 			delete this->items.at(itemCounter);
 			this->player->addScore(this->redGemPoint);
 			this->items.erase(this->items.begin() + itemCounter);
-			this->pickUpItemSound.play();
+			this->coinSound.play();
 			--itemCounter;
 		}
 		++itemCounter;

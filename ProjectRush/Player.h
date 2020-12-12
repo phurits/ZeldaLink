@@ -31,6 +31,10 @@ private:
 	bool DmgBoostState;
 	sf::Clock dmgBoostTimer;
 
+	float playerSpeed;
+	bool SpeedBoostState;
+	sf::Clock speedBoostTimer;
+
 	//Hitbox
 	Hitbox* hitbox;
 
@@ -78,6 +82,10 @@ public:
 	const bool& getDmgBoostState() const;
 	void boostDMG();
 
+	const float& getPlayerSpeed() const;
+	const bool& getSpeedBoostState() const;
+	void speedBoost();
+
 	//Modifiers
 	void setPosition(const float x, const float y);
 	void takeDmg(int dmg);
@@ -90,7 +98,6 @@ public:
 	void createHitbox(float offset_x, float offset_y, float width, float height);
 
 	//Functions
-	void move(const float& dt, const float dir_x, const float dir_y);
 	void resetToNormal(const float& dt);
 	void updateMovement(const float& dt);
 	void updateAnimation(const float& dt);

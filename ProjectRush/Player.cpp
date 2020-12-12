@@ -10,6 +10,7 @@ void Player::initVariables()
 	this->hp = maxHp;
 	this->firerate = 0.4f;
 	this->playerDmg = 1;
+	this->playerSpeed = 2.f;
 	this->name = "";
 	
 }
@@ -97,6 +98,7 @@ const int& Player::getMaxHp() const
 	return this->maxHp;
 }
 
+//FIRERATE SETUP
 const float& Player::getFirerate() const
 {
 	return this->firerate;
@@ -107,6 +109,15 @@ const bool& Player::getFirerateState() const
 	return this->firerateState;
 }
 
+void Player::reduceFirerateCDR()
+{
+	this->firerate = 0.2f;
+	this->firerateState = true;
+	this->firerateCDRTimer.restart();
+	std::cout << "reduceFirerate = ON" << " " << this->firerate << "\n";
+}
+
+//PLAYER DMG SETUP
 const int& Player::getPlayerDmg() const
 {
 	return this->playerDmg;
@@ -119,17 +130,32 @@ const bool& Player::getDmgBoostState() const
 
 void Player::boostDMG()
 {
-	this->playerDmg = 3;
+	this->playerDmg = 5;
 	this->DmgBoostState = true;
 	this->dmgBoostTimer.restart();
+	std::cout << "BoostDMG = ON" << " " << this->playerDmg << "\n";
 }
 
-void Player::reduceFirerateCDR()
+//PLAYER SPEED SETUP
+const float& Player::getPlayerSpeed() const
 {
-	this->firerate = 0.2f;
-	this->firerateState = true;
-	this->firerateCDRTimer.restart();
+	return this->playerSpeed;
 }
+
+const bool& Player::getSpeedBoostState() const
+{
+	return this->SpeedBoostState;
+}
+
+void Player::speedBoost()
+{
+	this->playerSpeed = 3.f;
+	this->SpeedBoostState = true;
+	this->speedBoostTimer.restart();
+	std::cout << "SpeedBoost = ON" << " " << this->playerSpeed << "\n";
+}
+
+
 
 const int& Player::getScore() const
 {
@@ -161,8 +187,6 @@ void Player::heal(int x)
 	this->hp += x;
 }
 
-
-
 void Player::addScore(int x)
 {
 	this->score += x;
@@ -184,10 +208,6 @@ void Player::createHitbox(float offset_x, float offset_y, float width, float hei
 }
 //Functions
 
-void Player::move(const float& dt, const float dir_x, const float dir_y)
-{
-}
-
 void Player::resetToNormal(const float& dt)
 {
 	if (this->takeDmgTimer.getElapsedTime().asSeconds() >= 0.15f)
@@ -204,6 +224,11 @@ void Player::resetToNormal(const float& dt)
 		this->playerDmg = 1;
 		this->DmgBoostState = false;
 	}
+	if (this->speedBoostTimer.getElapsedTime().asSeconds() >= 7.f && this->SpeedBoostState)
+	{
+		this->playerSpeed = 2.f;
+		this->SpeedBoostState = false;
+	}
 }
 
 void Player::updateMovement(const float& dt)
@@ -213,25 +238,25 @@ void Player::updateMovement(const float& dt)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) //LEFT
 	{
 		
-		this->sprite->move(-2.f, 0.f);
+		this->sprite->move(-this->playerSpeed, 0.f);
 		this->animationState = P_MOVING_LEFT;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) //RIGHT
 	{
 		
-		this->sprite->move(2.f, 0.f);
+		this->sprite->move(this->playerSpeed, 0.f);
 		this->animationState = P_MOVING_RIGHT;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) //UP
 	{
 		
-		this->sprite->move( 0.f, -2.f); // NOT USING ACC
+		this->sprite->move( 0.f, -this->playerSpeed); // NOT USING ACC
 		this->animationState = P_MOVING_UP;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) //DOWN
 	{
 		
-		this->sprite->move(0.f, 2.f);
+		this->sprite->move(0.f, this->playerSpeed);
 		this->animationState = P_MOVING_DOWN;
 	}
 }

@@ -22,6 +22,7 @@ private:
 	bool isDrop;
 	bool isDeath;
 
+	float speed;
 	short xAxis;
 	short yAxis;
 
@@ -64,9 +65,14 @@ public:
 	std::string getType();
 	int getMaxHp();
 	sf::Vector2f getCenter();
+	float getSpeed();
+
+	const bool& getConfusedState() const;
+	void enemyConfused();
 
 	//Modifiers
 	void takeDmg(int dmg);
+	void setSpeed(float speed);
 	void setPosition(float pos_x, float pos_y);
 
 	//Components

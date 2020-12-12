@@ -25,6 +25,8 @@ private:
     sf::Sound eHitSound;
     sf::SoundBuffer pDeath;
     sf::Sound pDeathSound;
+    sf::SoundBuffer coin;
+    sf::Sound coinSound;
     
 
     //GUI
@@ -74,6 +76,7 @@ private:
     sf::Clock shootTimer;
 
     //Item
+    int numberItems;
     std::vector<Item*> items;
     std::map<std::string, sf::SoundBuffer*> soundEffects;
 
