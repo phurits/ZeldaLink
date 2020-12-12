@@ -188,7 +188,7 @@ void GameplayState::initGUI()
 	this->scoreText.setFont(this->font);
 	this->scoreText.setLetterSpacing(2.f);
 	this->scoreText.setString(std::to_string(this->player->getScore()));
-	this->scoreText.setCharacterSize(30.f);
+	this->scoreText.setCharacterSize(30);
 	this->scoreText.setFillColor(sf::Color::Yellow);
 	this->scoreText.setOutlineThickness(2.f);
 	this->scoreText.setOutlineColor(sf::Color::Black);
@@ -352,7 +352,7 @@ void GameplayState::updateInput(const float& dt)
 		{
 			this->pShootSound.play();
 			this->bullets.push_back(new Bullet(this->textures["FIREBALL"], 
-				this->player->getPosition().x + (this->player->getGlobalBounds().width / 2.f),
+				(this->player->getPosition().x + (this->player->getGlobalBounds().width / 3.f)) + rand() % static_cast<int>(this->player->getGlobalBounds().width / 3.f),
 				this->player->getPosition().y + (this->player->getGlobalBounds().height / 2.f), 
 				0.f, -1.f, 5.f));
 			this->shootTimer.restart();
@@ -364,7 +364,7 @@ void GameplayState::updateInput(const float& dt)
 		{
 			this->pShootSound.play();
 			this->bullets.push_back(new Bullet(this->textures["FIREBALL"],
-				this->player->getPosition().x + (this->player->getGlobalBounds().width / 2.f),
+				(this->player->getPosition().x + (this->player->getGlobalBounds().width / 3.f)) + rand() % static_cast<int>(this->player->getGlobalBounds().width / 3.f),
 				this->player->getPosition().y + (this->player->getGlobalBounds().height / 2.f),
 				0.f, 1.f, 5.f));
 			this->shootTimer.restart();
@@ -377,7 +377,7 @@ void GameplayState::updateInput(const float& dt)
 			this->pShootSound.play();
 			this->bullets.push_back(new Bullet(this->textures["FIREBALL"],
 				this->player->getPosition().x + (this->player->getGlobalBounds().width / 2.f),
-				this->player->getPosition().y + (this->player->getGlobalBounds().height / 2.f),
+				(this->player->getPosition().y + (this->player->getGlobalBounds().height / 3.f)) + rand() % static_cast<int>(this->player->getGlobalBounds().height / 3.f), 
 				-1.f, 0.f, 5.f));
 			this->shootTimer.restart();
 		}
@@ -389,7 +389,7 @@ void GameplayState::updateInput(const float& dt)
 			this->pShootSound.play();
 			this->bullets.push_back(new Bullet(this->textures["FIREBALL"],
 				this->player->getPosition().x + (this->player->getGlobalBounds().width / 2.f),
-				this->player->getPosition().y + (this->player->getGlobalBounds().height / 2.f),
+				(this->player->getPosition().y + (this->player->getGlobalBounds().height / 3.f)) + rand() % static_cast<int>(this->player->getGlobalBounds().height / 3.f),
 				1.f,0.f, 5.f));
 			this->shootTimer.restart();
 		}

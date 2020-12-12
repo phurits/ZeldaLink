@@ -8,6 +8,7 @@ private:
 
 	sf::Sprite shape;
 	sf::RectangleShape body;
+	float rotate;
 
 	sf::Vector2f direction;
 	float movementSpeed;
@@ -22,8 +23,10 @@ public:
 	const sf::FloatRect getBounds() const;
 	sf::Sprite& getSprite();
 	bool isIntersects(sf::FloatRect other);
+	float getRotationAngle(float angle);
 
 	//Modifiers
+	void setRotation(float angle);
 
 	//Functions
 	void update();

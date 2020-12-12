@@ -136,7 +136,7 @@ void MainMenuState::updateButtons()
 	//Quit
 	if (this->buttons["EXIT_STATE"]->isPressed())
 	{
-		this->endState();
+		this->window->close();
 		this->quit = true;
 	}
 }

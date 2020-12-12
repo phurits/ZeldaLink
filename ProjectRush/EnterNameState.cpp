@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "EnterNameState.h"
+#include "Player.h"
 
 //Initializer
 void EnterNameState::initVariables()
@@ -13,11 +14,12 @@ void EnterNameState::initVariables()
 	this->player->setPosition(20.f, 20.f);
 
 	this->nameEnter.setFont(this->font);
-	this->nameEnter.setCharacterSize(50.f);
-	//this->nameEnter.setLetterSpacing(1.6f);
-	this->nameEnter.setOutlineThickness(1.5f);
-	this->nameEnter.setOutlineColor(sf::Color::Black);
-	this->nameEnter.setPosition(630.f, 200.f);
+	this->nameEnter.setCharacterSize(100.f);
+	this->nameEnter.setLetterSpacing(1.6f);
+	this->nameEnter.setOutlineThickness(2.f);
+	this->nameEnter.setFillColor(sf::Color::Black);
+	this->nameEnter.setOutlineColor(sf::Color::White);
+	this->nameEnter.setPosition(430.f, 30.f);
 	this->nameEnter.setString("ENTER NAME");
 
 	this->textHolder.setFillColor(sf::Color(255,255,255,100));
@@ -27,6 +29,8 @@ void EnterNameState::initVariables()
 	this->textHolder.setPosition(sf::Vector2f(700,300));
 
 	this->text.setFillColor(sf::Color::Black);
+	this->text.setOutlineThickness(1.f);
+	this->text.setOutlineColor(sf::Color::White);
 }
 
 void EnterNameState::initMusic()
@@ -53,7 +57,7 @@ void EnterNameState::initBackground()
 	this->background.setSize(sf::Vector2f(static_cast<float>(this->window->getSize().x)
 		, static_cast<float>(this->window->getSize().y)));
 
-	if (!this->backgroundTexture.loadFromFile("Resources/Images/Backgrounds/wallpaper.jpg"))
+	if (!this->backgroundTexture.loadFromFile("Resources/Images/Backgrounds/enternameBG.png"))
 	{
 		std::cout << "ERROR::MAIN_MENU_STATE::FAILED TO LOAD BACKGROUND TO TEXTURE" << std::endl;
 	}
@@ -73,8 +77,9 @@ void EnterNameState::initText()
 {
 	this->input = "";
 	this->text.setFont(this->font);
-	this->text.setCharacterSize(25.f);
-	this->text.setPosition(700,310);
+	this->text.setOrigin(this->text.getGlobalBounds().width / 2, 0);
+	this->text.setCharacterSize(70.f);
+	this->text.setPosition(800,250);
 }
 
 void EnterNameState::initKeybinds()
@@ -96,8 +101,32 @@ void EnterNameState::initKeybinds()
 
 void EnterNameState::initButtons()
 {
-	this->buttons["GAME_STATE"] = new Button(this->view->getCenter().x - this->window->getSize().x / 2.f + 700 , this->view->getCenter().y - this->window->getSize().y / 2.f + 400, 200, 50, &this->font, "START", 40,
+	this->buttons["GAME_STATE"] = new Button(this->view->getCenter().x - this->window->getSize().x / 2.f + 630 , this->view->getCenter().y - this->window->getSize().y / 2.f + 420, 350, 100, &this->font, "START", 80,
 		sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0));
+}
+
+void EnterNameState::initDecorates()
+{
+	this->textures["ZELDA"] = new sf::Texture;
+	this->textures["ZELDA"]->loadFromFile("Resources/Images/Sprites/Player/Full_Movement.png");
+
+	this->textures["BLUE_SLIME"] = new sf::Texture;
+	this->textures["BLUE_SLIME"]->loadFromFile("Resources/Images/Sprites/Enemy/blue_slime.png");
+	this->textures["PINK_SLIME"] = new sf::Texture;
+	this->textures["PINK_SLIME"]->loadFromFile("Resources/Images/Sprites/Enemy/pink_slime.png");
+	this->textures["YELLOW_SLIME"] = new sf::Texture;
+	this->textures["YELLOW_SLIME"]->loadFromFile("Resources/Images/Sprites/Enemy/yellow_slime.png");
+
+	//Spawn all Zelda Left Side
+	this->enemies.push_back(new Enemy(this->textures["ZELDA"], "ZELDA_U", 225, 190));
+	this->enemies.push_back(new Enemy(this->textures["ZELDA"], "ZELDA_D", 235, 300));
+	this->enemies.push_back(new Enemy(this->textures["ZELDA"], "ZELDA_L", 110, 300));
+	this->enemies.push_back(new Enemy(this->textures["ZELDA"], "ZELDA_R", 363, 300));
+
+	this->enemies.push_back(new Enemy(this->textures["BLUE_SLIME"], "ENS_BSLIME", 20, 700));
+	this->enemies.push_back(new Enemy(this->textures["PINK_SLIME"], "ENS_PSLIME", 240, 700));
+	this->enemies.push_back(new Enemy(this->textures["YELLOW_SLIME"], "ENS_YSLIME", 480, 700));
+
 }
 
 EnterNameState::EnterNameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states, sf::View* view, Player* player)
@@ -110,6 +139,8 @@ EnterNameState::EnterNameState(sf::RenderWindow* window, std::map<std::string, i
 	this->initText();
 	this->initKeybinds();
 	this->initButtons();
+	this->initDecorates();
+	
 
 }
 
@@ -120,7 +151,14 @@ EnterNameState::~EnterNameState()
 	{
 		delete it->second;
 	}
-
+	for (auto& i : this->textures)
+	{
+		delete i.second;
+	}
+	for (auto* enemy : this->enemies)
+	{
+		delete enemy;
+	}
 }
 
 void EnterNameState::endState()
@@ -168,7 +206,7 @@ void EnterNameState::update(const float& dt)
 				}
 				else
 				{
-					if (this->input.getSize() < 13 && this->nameEvent.text.unicode != 13)
+					if (this->input.getSize() < 8 && this->nameEvent.text.unicode != 13)
 					{
 						if (this->nameEvent.text.unicode >= 97 && this->nameEvent.text.unicode <= 122)
 						{
@@ -187,8 +225,13 @@ void EnterNameState::update(const float& dt)
 	this->updateInput(dt);
 	this->updateButtons();
 
+	for (auto* enemy : this->enemies)
+	{
+		enemy->update(this->player, dt);
+	}
 
 	this->text.setString(this->input);
+	this->text.setOrigin(this->text.getGlobalBounds().width / 2.f, 0.f);
 }
 
 void EnterNameState::renderButtons(sf::RenderTarget* target)
@@ -207,7 +250,13 @@ void EnterNameState::render(sf::RenderTarget* target)
 	target->draw(this->background);
 	this->renderButtons(target);
 
+	for (auto* enemy : this->enemies)
+	{
+		enemy->render(target);
+	}
+
 	target->draw(this->nameEnter);
-	target->draw(this->textHolder);
+	//target->draw(this->textHolder);
 	target->draw(this->text);
+	
 }

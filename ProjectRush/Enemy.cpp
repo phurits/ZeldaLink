@@ -61,7 +61,7 @@ Enemy::Enemy(sf::Texture* texture, std::string type, float pos_x, float pos_y)
 		this->hitbox = new Hitbox(this->sprite, 5, 5, 44, 30);
 		this->hpMax = 3;
 		this->hp = hpMax;
-		this->points = 100;
+		this->points = 300;
 		this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 2, 0, 36, 27);
 		this->animationComponent->addAnimation("MOVE_LEFT", 10.f, 0, 1, 2, 1, 36, 27);
 		this->animationComponent->addAnimation("MOVE_RIGHT", 10.f, 0, 2, 2, 2, 36, 27);
@@ -95,6 +95,51 @@ Enemy::Enemy(sf::Texture* texture, std::string type, float pos_x, float pos_y)
 		this->animationComponent->addAnimation("MOVE_RIGHT", 10.f, 0, 2, 2, 2, 36, 27);
 		this->animationComponent->addAnimation("MOVE_UP", 10.f, 0, 3, 2, 3, 36, 27);
 		this->animationComponent->addAnimation("MOVE_DOWN", 10.f, 0, 0, 2, 0, 36, 27);
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if (this->type == "ZELDA_U")
+	{
+		this->sprite.setScale(0.7, 0.7);
+		this->hitbox = new Hitbox(this->sprite, 0, 0, 36, 27);
+		this->animationComponent->addAnimation("WALK_UP", 11.f, 0, 0, 5, 0, 126, 126);
+	}
+	if (this->type == "ZELDA_D")
+	{
+		this->sprite.setScale(0.7, 0.7);
+		this->hitbox = new Hitbox(this->sprite, 0, 0, 36, 27);
+		this->animationComponent->addAnimation("WALK_DOWN", 11.f, 0, 2, 5, 2, 126, 126);
+	}
+	if (this->type == "ZELDA_L")
+	{
+		this->sprite.setScale(0.7, 0.7);
+		this->hitbox = new Hitbox(this->sprite, 0, 0, 36, 27);
+		this->animationComponent->addAnimation("WALK_LEFT", 11.f, 0, 1, 5, 1, 126, 126);
+		
+	}
+	if (this->type == "ZELDA_R")
+	{
+		this->sprite.setScale(0.7, 0.7);
+		this->hitbox = new Hitbox(this->sprite, 0, 0, 36, 27);
+		this->animationComponent->addAnimation("WALK_RIGHT", 11.f, 0, 3, 5, 3, 126, 126);
+	}
+	if (this->type == "ENS_BSLIME")
+	{
+		this->sprite.setScale(3.5, 3.5);
+		this->hitbox = new Hitbox(this->sprite, 0, 0, 36, 27);
+		this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 2, 0, 36, 27);
+	}
+	if (this->type == "ENS_PSLIME")
+	{
+		this->sprite.setScale(3.5, 3.5);
+		this->hitbox = new Hitbox(this->sprite, 0, 0, 36, 27);
+		this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 2, 0, 36, 27);
+	}
+	if (this->type == "ENS_YSLIME")
+	{
+		this->sprite.setScale(3.5, 3.5);
+		this->hitbox = new Hitbox(this->sprite, 0, 0, 36, 27);
+		this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 2, 0, 36, 27);
 	}
 }
 
@@ -404,7 +449,34 @@ void Enemy::updateAnimation(const float& dt)
 			this->animationComponent->play("IDLE", dt);
 		}
 	}
-
+	if (this->type == "ZELDA_U")
+	{
+		this->animationComponent->play("WALK_UP", dt, true);
+	}
+	if (this->type == "ZELDA_D")
+	{
+		this->animationComponent->play("WALK_DOWN", dt, true);
+	}
+	if (this->type == "ZELDA_L")
+	{
+		this->animationComponent->play("WALK_LEFT", dt, true);
+	}
+	if (this->type == "ZELDA_R")
+	{
+		this->animationComponent->play("WALK_RIGHT", dt,true);
+	}
+	if (this->type == "ENS_BSLIME")
+	{
+		this->animationComponent->play("IDLE", dt,true);
+	}
+	if (this->type == "ENS_PSLIME")
+	{
+		this->animationComponent->play("IDLE", dt, true);
+	}
+	if (this->type == "ENS_YSLIME")
+	{
+		this->animationComponent->play("IDLE", dt, true);
+	}
 }
 
 void Enemy::updateColor()

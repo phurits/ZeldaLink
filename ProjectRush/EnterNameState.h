@@ -1,14 +1,17 @@
 #pragma once
 #include "State.h"
 #include "GameplayState.h"
+#include "Enemy.h"
+#include"Player.h"
 
 class EnterNameState :
 	public State
 {
 private:
 	sf::Event nameEvent;
-	sf::Texture backgroundTexture;
 	sf::RectangleShape background;
+	sf::Texture backgroundTexture;
+
 	sf::RectangleShape textHolder;
 	sf::Text nameEnter;
 
@@ -25,6 +28,12 @@ private:
 	sf::Sound enterWordSound;
 	sf::SoundBuffer deleteWord;
 	sf::Sound deleteWordSound;
+	
+	//Add Animation
+	std::map<std::string, sf::Texture*> textures;
+	std::vector<Enemy*> enemies;
+	
+	//Decorate
 
 	//Initializer
 	void initVariables();
@@ -34,6 +43,7 @@ private:
 	void initText();
 	void initKeybinds();
 	void initButtons();
+	void initDecorates();
 
 public:
 	EnterNameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states, sf::View* view, Player* player);

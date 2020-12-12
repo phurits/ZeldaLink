@@ -67,8 +67,6 @@ public:
 	sf::Vector2f getCenter();
 	float getSpeed();
 
-	const bool& getConfusedState() const;
-	void enemyConfused();
 
 	//Modifiers
 	void takeDmg(int dmg);
