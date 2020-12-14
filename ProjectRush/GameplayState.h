@@ -51,6 +51,9 @@ private:
     sf::Vector2f spawnRange;
     sf::Vector2f enemyPos;
 
+    int enemyDamage;
+    sf::Clock enemyDamageTimer;
+
     int enemyKillCount;
     int blueAmount;
     int blueMax;
@@ -77,6 +80,7 @@ private:
 
     //Item
     int numberItems;
+    sf::Clock itemSpawnTimer;
     std::vector<Item*> items;
     std::map<std::string, sf::SoundBuffer*> soundEffects;
 
@@ -107,6 +111,7 @@ public:
     //Functions
     void endState();
     void spawnEnemies();
+    void enemyDamageUp();
 
     //Update
     void updateView(const float& dt);

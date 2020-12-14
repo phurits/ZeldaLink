@@ -32,6 +32,7 @@ void GameplayState::initVariables()
 	this->changeColor = 255;
 
 	this->spawnRange = sf::Vector2f(800.f, 800.f);
+	this->enemyDamage = 1;
 
 	//Enemy Kill Total
 	this->enemyKillCount = 0;
@@ -155,7 +156,8 @@ void GameplayState::initPlayer()
 
 void GameplayState::initItem()
 {
-
+	this->enemyDamageTimer.restart();
+	this->itemSpawnTimer.restart();
 }
 
 void GameplayState::initView()
@@ -198,7 +200,6 @@ void GameplayState::initGUI()
 GameplayState::GameplayState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states, sf::View* view, Player* player)
 	: State(window, supportedKeys, states, view, player)
 {
-	
 	this->initView();
 	this->initTexture();
 	this->initFont();
@@ -293,7 +294,7 @@ void GameplayState::spawnEnemies()
 		}
 		//ITEM DROP EVERY 20 ENEMY DIE
 		
-		if (this->enemyKillCount == 20)
+		if (this->enemyKillCount >= 20)
 		{
 			if (randomItem % this->numberItems == 0)
 			{
@@ -309,6 +310,31 @@ void GameplayState::spawnEnemies()
 			}
 			this->enemyKillCount = 0;
 		}
+		if (this->itemSpawnTimer.getElapsedTime().asSeconds() >= 30.f)
+		{
+			if (randomItem % this->numberItems == 0)
+			{
+				this->items.push_back(new Item(this->textures["PURPLE_POTION"], "FIRE_RATE", enemyPos.x, enemyPos.y));
+			}
+			else if (randomItem % this->numberItems == 1)
+			{
+				this->items.push_back(new Item(this->textures["RED_POTION"], "DMG_BOOST", enemyPos.x, enemyPos.y));
+			}
+			else if (randomItem % this->numberItems == 2)
+			{
+				this->items.push_back(new Item(this->textures["YELLOW_POTION"], "SPEED_BOOST", enemyPos.x, enemyPos.y));
+			}
+			this->itemSpawnTimer.restart();
+		}
+	}
+}
+
+void GameplayState::enemyDamageUp()
+{
+	if (this->enemyDamageTimer.getElapsedTime().asSeconds() >= 180.f)
+	{
+		this->enemyDamage++;
+		this->enemyDamageTimer.restart();
 	}
 }
 
@@ -453,7 +479,7 @@ void GameplayState::updateCollision(const float& dt)
 	{
 		if (this->player->getHitbox().intersects(enemy->getHitbox()) && enemy->getHp() > 0)
 		{
-			this->player->takeDmg(1);
+			this->player->takeDmg(enemyDamage);
 			if (enemy->getHp() <= 0)
 			{
 				this->player->addScore(enemy->getPoint());
@@ -669,6 +695,7 @@ void GameplayState::update(const float& dt)
 {
 	this->updateMousePosition();
 	this->spawnEnemies();
+	this->enemyDamageUp();
 	
 	this->window->setView(*this->view);
 	this->updateInput(dt);
@@ -686,7 +713,7 @@ void GameplayState::update(const float& dt)
 	this->updateToNextState(dt);
 
 	
-
+	std::cout << this->enemyDamage << "\n";
 	//std::cout << this->view->getCenter().x << " " << this->view->getCenter().y << "\n";
 }
 
